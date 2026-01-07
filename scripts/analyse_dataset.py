@@ -4,7 +4,7 @@ import argparse, os
 from pathlib import Path
 
 import re
-from statistics import mean
+from statistics import mean, median
 
 def jsonl_to_csv(input_jsonl: str, output_csv: str, delimiter: str = ";"):
 
@@ -57,6 +57,7 @@ def get_stats_from_csv(input_csv: str):
     time_minutes_list = []
     unique_tools_per_entry = []
     unique_tools = set()
+    all_tools_per_entry = []
 
     with open(input_csv, "r", encoding="utf-8") as f:
         reader = csv.DictReader(f, delimiter=";")
@@ -100,27 +101,45 @@ def get_stats_from_csv(input_csv: str):
 
             unique_tools_per_entry.append(sorted(entry_tools))
 
+            # All tools per entry
+            tools_str = row.get("Tools", "")
+            all_tools = []
+            for tool in tools_str.split("|"):
+                tool = tool.strip()
+                if tool:
+                    all_tools.append(tool)
+            all_tools_per_entry.append(all_tools)
+
     stats = {
         "number_of_tools_per_entry": {
             "min": min(num_tools_list) if num_tools_list else None,
             "max": max(num_tools_list) if num_tools_list else None,
             "avg": mean(num_tools_list) if num_tools_list else None,
+            "median": median(num_tools_list) if num_tools_list else None,
         },
         "number_of_steps_per_entry": {
             "min": min(num_steps_list) if num_steps_list else None,
             "max": max(num_steps_list) if num_steps_list else None,
             "avg": mean(num_steps_list) if num_steps_list else None,
+            "median": median(num_steps_list) if num_steps_list else None,
         },
         "time_taken_minutes_per_entry": {
             "min": min(time_minutes_list) if time_minutes_list else None,
             "max": max(time_minutes_list) if time_minutes_list else None,
             "avg": mean(time_minutes_list) if time_minutes_list else None,
+            "median": median(time_minutes_list) if time_minutes_list else None,
         },
         "total_unique_tools": {
             "count": len(unique_tools),
             "tools": sorted(unique_tools),
         },
         "unique_tools_per_entry": unique_tools_per_entry,
+        "range_of_unique_tools_per_entry": {
+            "min": min(len(tools) for tools in unique_tools_per_entry) if unique_tools_per_entry else None,
+            "max": max(len(tools) for tools in unique_tools_per_entry) if unique_tools_per_entry else None,
+            "avg": mean(len(tools) for tools in unique_tools_per_entry) if unique_tools_per_entry else None,
+        },
+        "all_tools_per_entry": all_tools_per_entry,
     }
     return stats
 
@@ -152,11 +171,19 @@ def main():
         stats = get_stats_from_csv(str(save_path))
         print("Dataset Statistics:")
         for key, value in stats.items():
-            if key != "unique_tools_per_entry" or key == "unique_tools":
+            if not (key == "unique_tools_per_entry" or key == "unique_tools" or key == "all_tools_per_entry"):
                 print(f"  {key}: {value}")
 
-    for idx, tools in enumerate(stats["unique_tools_per_entry"]):
-        print(f"Entry {idx}: {tools}")
+    assert "all_tools_per_entry" in stats, "Expected key 'all_tools_per_entry' not found in stats."
+    assert "unique_tools_per_entry" in stats, "Expected key 'unique_tools_per_entry' not found in stats."
+
+    assert len(stats["all_tools_per_entry"]) == len(stats["unique_tools_per_entry"]), \
+        "Mismatch in lengths of 'all_tools_per_entry' and 'unique_tools_per_entry'."
+
+    for idx in range(len(stats["unique_tools_per_entry"])):
+        unique_tools = stats["unique_tools_per_entry"][idx]
+
+        print(f"Entry {idx}: Unique Tools: {unique_tools}")
 
 if __name__ == "__main__":
     main()   
