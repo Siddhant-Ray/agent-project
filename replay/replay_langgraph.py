@@ -1,31 +1,23 @@
 """
-End-to-end: Dynamic LangGraph "trace replayer" driven by Annotator Metadata.Steps.
+End-to-end LangGraph trace replayer (dynamic steps) with:
+✅ vLLM OpenAI-compatible LLM
+✅ Playwright browser tools + DuckDuckGo search tool
+✅ OCR tool with robust candidate-page strategy (keeps tesseract)
+✅ Per-step FULL input + FULL output saved (not compact)
+✅ Per-tool-call FULL input + FULL output saved (not compact)
+✅ Total execution time
+✅ JSON checkpoint record/replay across runs
 
-- Parses step count from task JSON (NO hardcoded 12/10).
-- Builds a linear LangGraph with N nodes (N = number of parsed steps).
-- Uses LangChain "inbuilt" toolkits where available:
-  - Web browser: PlayWrightBrowserToolkit (LangChain community)
-  - Search engine: DuckDuckGoSearchResults (LangChain community; no API key)
-- Uses an OCR tool implemented as a LangChain @tool (LangChain doesn't ship a first-party OCR tool).
-- Uses open-source LLM served via vLLM online (OpenAI-compatible) through ChatOpenAI.
-
-Run vLLM (new CLI):
+Run vLLM:
   vllm serve meta-llama/Meta-Llama-3.1-8B-Instruct --host 0.0.0.0 --port 8000
 
 Install:
-  pip install -U langgraph langchain langchain-openai langchain-community playwright lxml pymupdf pillow pytesseract duckduckgo-search
+  pip install -U langgraph langchain langchain-openai langchain-community playwright pymupdf pillow pytesseract duckduckgo-search
   playwright install chromium
-  # plus system tesseract:
-  #   macOS: brew install tesseract
-  #   Ubuntu: sudo apt-get install -y tesseract-ocr
 
 Usage:
-  python trace_replay_langgraph.py --task_json task1.json --mode record
-  python trace_replay_langgraph.py --task_json task1.json --mode replay
-
-Notes:
-- "record" runs tools + writes checkpoints into SQLite.
-- "replay" loads the stored state for that task_id and prints the last checkpointed state (no new tool calls).
+  python replay_langgraph_fullio.py --task_json task.json --mode record
+  python replay_langgraph_fullio.py --task_json task.json --mode replay
 """
 
 import os
@@ -33,6 +25,8 @@ import re
 import json
 import argparse
 import asyncio
+import time
+import hashlib
 from typing import Any, Dict, List, Optional, TypedDict, Literal
 
 from langchain_openai import ChatOpenAI
@@ -40,16 +34,12 @@ from langchain_core.tools import tool
 from langchain_core.messages import SystemMessage, HumanMessage
 
 from langgraph.graph import StateGraph, END
-from langgraph.checkpoint.sqlite import SqliteSaver
 
-# Browser toolkit (LangChain community)
 from langchain_community.agent_toolkits import PlayWrightBrowserToolkit
-from langchain_community.tools.playwright.utils import create_async_playwright_browser
-
-# Search tool (no API key)
 from langchain_community.tools import DuckDuckGoSearchResults
 
-# OCR deps
+from playwright.async_api import async_playwright, Browser
+
 import requests
 import fitz  # PyMuPDF
 from PIL import Image
@@ -63,11 +53,32 @@ VLLM_BASE_URL = os.getenv("VLLM_BASE_URL", "http://localhost:8000/v1")
 VLLM_API_KEY = os.getenv("VLLM_API_KEY", "EMPTY")
 MODEL_NAME = os.getenv("MODEL_NAME", "meta-llama/Meta-Llama-3.1-8B-Instruct")
 
-SQLITE_PATH = os.getenv("SQLITE_PATH", "trace_checkpoints.sqlite")
+JSON_CKPT_DIR = os.getenv("JSON_CKPT_DIR", "checkpoints_json")
 
 
 # ----------------------------
-# Task parsing
+# JSON checkpoints (cross-run replay)
+# ----------------------------
+def json_ckpt_path(task_id: str) -> str:
+    os.makedirs(JSON_CKPT_DIR, exist_ok=True)
+    return os.path.join(JSON_CKPT_DIR, f"{task_id}.json")
+
+
+def json_ckpt_save(task_id: str, state: Dict[str, Any]) -> None:
+    with open(json_ckpt_path(task_id), "w", encoding="utf-8") as f:
+        json.dump(state, f, indent=2, ensure_ascii=False, default=str)
+
+
+def json_ckpt_load(task_id: str) -> Optional[Dict[str, Any]]:
+    p = json_ckpt_path(task_id)
+    if not os.path.exists(p):
+        return None
+    with open(p, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+
+# ----------------------------
+# Helpers
 # ----------------------------
 def parse_annotator_steps(task_json: Dict[str, Any]) -> List[str]:
     steps_blob = task_json["Annotator Metadata"]["Steps"]
@@ -77,32 +88,45 @@ def parse_annotator_steps(task_json: Dict[str, Any]) -> List[str]:
     return [m.strip() for m in matches]
 
 
-# ----------------------------
-# Minimal arXiv result parsing helper
-# (works on extracted text; robust enough for this use)
-# ----------------------------
 def parse_arxiv_abs_links(text: str) -> List[str]:
-    # Extract arXiv /abs/ links
     return sorted(set(re.findall(r"https?://arxiv\.org/abs/\d+\.\d+(?:v\d+)?", text)))
 
 
 def make_arxiv_pdf_url(abs_url: str) -> str:
-    # abs -> pdf
-    # https://arxiv.org/abs/xxxx.yyyy -> https://arxiv.org/pdf/xxxx.yyyy.pdf
     m = re.search(r"/abs/(\d+\.\d+)", abs_url)
     if not m:
         return abs_url
     return f"https://arxiv.org/pdf/{m.group(1)}.pdf"
 
 
+def sha256_short(x: Any) -> str:
+    b = json.dumps(x, ensure_ascii=False, default=str).encode("utf-8")
+    return hashlib.sha256(b).hexdigest()[:16]
+
+
 # ----------------------------
-# OCR tool (LangChain Tool)
+# OCR tool (keeps tesseract)
 # ----------------------------
 @tool("ocr_pdf_find_axis_labels")
-def ocr_pdf_find_axis_labels(pdf_url: str) -> Dict[str, Any]:
-    """
-    Download a PDF and OCR early pages to find axis label words.
-    Returns OCR text and the page index where labels were detected.
+def ocr_pdf_find_axis_labels(
+    pdf_url: str,
+    max_pages: int = 80,
+    dpi: int = 300,
+    min_hits_to_accept: int = 3,
+    candidate_pool: int = 15,
+    fallback_stride: int = 1,
+) -> dict:
+    """Download a PDF and OCR pages likely to contain axis label words (tesseract).
+
+    Returns:
+      pdf_path
+      first_page_index_ge_threshold (or None)
+      best_page_index
+      best_hits
+      best_found_words
+      best_ocr_text
+      tried_pages
+      params
     """
     os.makedirs("downloads", exist_ok=True)
     pdf_path = os.path.join("downloads", "paper.pdf")
@@ -112,32 +136,99 @@ def ocr_pdf_find_axis_labels(pdf_url: str) -> Dict[str, Any]:
     with open(pdf_path, "wb") as f:
         f.write(r.content)
 
+    keywords = ["deontological", "egalitarian", "localized", "standardized", "utilitarian", "consequential"]
+
     doc = fitz.open(pdf_path)
-    keywords = ["deontological", "egalitarian", "utilitarian", "consequential", "localized", "standardized"]
+    scan_pages = min(max_pages, doc.page_count)
 
-    found_text = ""
-    found_page = None
+    # (A) Text-layer pre-scan: choose candidate pages
+    scored_pages = []
+    for i in range(scan_pages):
+        try:
+            text = (doc.load_page(i).get_text("text") or "").lower()
+        except Exception:
+            text = ""
+        hits = sum(1 for w in keywords if w in text)
+        boost = 0
+        if "figure" in text or "fig." in text:
+            boost += 1
+        if "axis" in text:
+            boost += 1
+        scored_pages.append((hits + boost, hits, i))
+    scored_pages.sort(reverse=True)
+    candidate_pages = [i for _, __, i in scored_pages[:candidate_pool]]
+    for i in range(min(6, scan_pages)):
+        if i not in candidate_pages:
+            candidate_pages.append(i)
 
-    for i in range(min(12, doc.page_count)):
-        page = doc.load_page(i)
-        pix = page.get_pixmap(dpi=220, alpha=False)
-        img_path = os.path.join("downloads", f"page_{i}.png")
+    tried_pages: List[int] = []
+    best = {"best_hits": -1, "best_page_index": None, "best_found_words": [], "best_ocr_text": ""}
+
+    def ocr_page(page_index: int) -> dict:
+        page = doc.load_page(page_index)
+        pix = page.get_pixmap(dpi=dpi, alpha=False)
+        img_path = os.path.join("downloads", f"page_{page_index}.png")
         pix.save(img_path)
-
         text = pytesseract.image_to_string(Image.open(img_path), lang="eng")
         low = text.lower()
-        hits = sum(1 for w in keywords if w in low)
-        if hits >= 3:
-            found_text = text
-            found_page = i
+        found = [w for w in keywords if w in low]
+        return {"text": text, "found": found, "hits": len(found)}
+
+    first_ge = None
+
+    # (B) OCR candidate pages
+    for pi in candidate_pages:
+        if pi < 0 or pi >= scan_pages:
+            continue
+        tried_pages.append(pi)
+        out = ocr_page(pi)
+        if out["hits"] > best["best_hits"]:
+            best = {
+                "best_hits": out["hits"],
+                "best_page_index": pi,
+                "best_found_words": out["found"],
+                "best_ocr_text": out["text"],
+            }
+        if first_ge is None and out["hits"] >= min_hits_to_accept:
+            first_ge = pi
             break
+
+    # (C) Fallback scan
+    if first_ge is None:
+        for pi in range(0, scan_pages, max(1, fallback_stride)):
+            if pi in tried_pages:
+                continue
+            tried_pages.append(pi)
+            out = ocr_page(pi)
+            if out["hits"] > best["best_hits"]:
+                best = {
+                    "best_hits": out["hits"],
+                    "best_page_index": pi,
+                    "best_found_words": out["found"],
+                    "best_ocr_text": out["text"],
+                }
+            if out["hits"] >= min_hits_to_accept:
+                first_ge = pi
+                break
 
     doc.close()
 
-    if not found_text:
-        raise RuntimeError("OCR could not find axis labels in first pages. Increase scan range if needed.")
-
-    return {"pdf_path": pdf_path, "page_index": found_page, "ocr_text": found_text}
+    return {
+        "pdf_path": pdf_path,
+        "first_page_index_ge_threshold": first_ge,
+        "best_page_index": best["best_page_index"],
+        "best_hits": best["best_hits"],
+        "best_found_words": best["best_found_words"],
+        "best_ocr_text": best["best_ocr_text"],
+        "tried_pages": tried_pages,  # FULL list
+        "params": {
+            "max_pages": max_pages,
+            "dpi": dpi,
+            "min_hits_to_accept": min_hits_to_accept,
+            "candidate_pool": candidate_pool,
+            "fallback_stride": fallback_stride,
+        },
+    }
 
 
 async def llm_extract_label_words(llm: ChatOpenAI, ocr_text: str) -> List[str]:
@@ -145,15 +236,13 @@ async def llm_extract_label_words(llm: ChatOpenAI, ocr_text: str) -> List[str]:
     user = HumanMessage(content=f"OCR TEXT:\n{ocr_text}")
     resp = await llm.ainvoke([sys, user])
     txt = (resp.content or "").strip()
-
     try:
         data = json.loads(txt)
         if isinstance(data, list):
             return [str(x).strip().lower() for x in data]
     except Exception:
         pass
-
-    # fallback scan
+    # fallback
     words = []
     for w in ["deontological", "egalitarian", "localized", "standardized", "utilitarian", "consequential"]:
         if w in ocr_text.lower():
@@ -161,16 +250,31 @@ async def llm_extract_label_words(llm: ChatOpenAI, ocr_text: str) -> List[str]:
     return sorted(set(words))
 
 
-async def llm_finalize(llm: ChatOpenAI, question: str, scratch: Dict[str, Any]) -> str:
-    sys = SystemMessage(content="Answer strictly in the format requested by the question. No extra text.")
-    user = HumanMessage(content=f"QUESTION:\n{question}\n\nEVIDENCE:\n{json.dumps(scratch, ensure_ascii=False)[:200000]}")
-    resp = await llm.ainvoke([sys, user])
-    return (resp.content or "").strip()
+# ----------------------------
+# Logs + State (FULL IO)
+# ----------------------------
+class ToolCallLog(TypedDict, total=False):
+    step_no: int
+    tool_name: str
+    tool_input_full: Any
+    tool_output_full: Any
+    tool_start_ts: float
+    tool_end_ts: float
+    tool_duration_s: float
+    error: str
 
 
-# ----------------------------
-# LangGraph state
-# ----------------------------
+class StepLog(TypedDict, total=False):
+    step_no: int
+    step_text: str
+    step_input_full: Dict[str, Any]
+    step_output_full: Dict[str, Any]
+    step_start_ts: float
+    step_end_ts: float
+    step_duration_s: float
+    error: str
+
+
 class TraceState(TypedDict, total=False):
     task: Dict[str, Any]
     steps: List[str]
@@ -178,267 +282,402 @@ class TraceState(TypedDict, total=False):
     scratch: Dict[str, Any]
     final_answer: Optional[str]
 
+    total_start_ts: float
+    total_end_ts: float
+    total_duration_s: float
+
+    step_logs: List[StepLog]
+    tool_call_logs: List[ToolCallLog]
+
+
+def ensure_state_initialized(state: TraceState) -> None:
+    state.setdefault("scratch", {})
+    state.setdefault("step_logs", [])
+    state.setdefault("tool_call_logs", [])
+    state.setdefault("step_idx", 0)
+    if "total_start_ts" not in state:
+        state["total_start_ts"] = time.time()
+
+
+def finalize_total(state: TraceState) -> None:
+    state["total_end_ts"] = time.time()
+    state["total_duration_s"] = float(state["total_end_ts"] - state["total_start_ts"])
+
+
+async def call_async_tool(
+    state: TraceState,
+    step_no: int,
+    name: str,
+    tool_obj: Any,
+    tool_input: Any,
+    scratch_key: Optional[str] = None,
+):
+    log: ToolCallLog = {
+        "step_no": step_no,
+        "tool_name": name,
+        "tool_input_full": tool_input,  # FULL
+        "tool_start_ts": time.time(),
+    }
+    try:
+        if isinstance(tool_input, dict):
+            out = await tool_obj.arun(tool_input)
+        else:
+            out = await tool_obj.ainvoke(tool_input)
+
+        if scratch_key:
+            state["scratch"][scratch_key] = out
+
+        log["tool_output_full"] = out  # FULL
+        log["tool_end_ts"] = time.time()
+        log["tool_duration_s"] = float(log["tool_end_ts"] - log["tool_start_ts"])
+        state["tool_call_logs"].append(log)
+        return out
+    except Exception as e:
+        log["tool_end_ts"] = time.time()
+        log["tool_duration_s"] = float(log["tool_end_ts"] - log["tool_start_ts"])
+        log["error"] = f"{type(e).__name__}: {e}"
+        state["tool_call_logs"].append(log)
+        raise
+
+
+def call_sync_tool(
+    state: TraceState,
+    step_no: int,
+    name: str,
+    fn,
+    tool_input: Dict[str, Any],
+    scratch_key: Optional[str] = None,
+):
+    log: ToolCallLog = {
+        "step_no": step_no,
+        "tool_name": name,
+        "tool_input_full": tool_input,  # FULL
+        "tool_start_ts": time.time(),
+    }
+    try:
+        out = fn(tool_input)
+
+        if scratch_key:
+            state["scratch"][scratch_key] = out
+
+        log["tool_output_full"] = out  # FULL
+        log["tool_end_ts"] = time.time()
+        log["tool_duration_s"] = float(log["tool_end_ts"] - log["tool_start_ts"])
+        state["tool_call_logs"].append(log)
+        return out
+    except Exception as e:
+        log["tool_end_ts"] = time.time()
+        log["tool_duration_s"] = float(log["tool_end_ts"] - log["tool_start_ts"])
+        log["error"] = f"{type(e).__name__}: {e}"
+        state["tool_call_logs"].append(log)
+        raise
+
+
+async def call_llm(
+    state: TraceState,
+    step_no: int,
+    llm: ChatOpenAI,
+    messages: List[Any],
+    scratch_key: Optional[str] = None,
+):
+    log: ToolCallLog = {
+        "step_no": step_no,
+        "tool_name": "llm.chat",
+        "tool_input_full": {"messages": [getattr(m, "content", str(m)) for m in messages]},  # FULL
+        "tool_start_ts": time.time(),
+    }
+    try:
+        out = await llm.ainvoke(messages)
+        content = getattr(out, "content", str(out))
+
+        if scratch_key:
+            state["scratch"][scratch_key] = content
+
+        log["tool_output_full"] = content  # FULL
+        log["tool_end_ts"] = time.time()
+        log["tool_duration_s"] = float(log["tool_end_ts"] - log["tool_start_ts"])
+        state["tool_call_logs"].append(log)
+        return out
+    except Exception as e:
+        log["tool_end_ts"] = time.time()
+        log["tool_duration_s"] = float(log["tool_end_ts"] - log["tool_start_ts"])
+        log["error"] = f"{type(e).__name__}: {e}"
+        state["tool_call_logs"].append(log)
+        raise
+
 
 # ----------------------------
-# Tool setup (browser + search)
+# Playwright tools setup (async-safe)
 # ----------------------------
-async def make_tools():
-    async_browser = create_async_playwright_browser()
-    browser_toolkit = PlayWrightBrowserToolkit.from_browser(async_browser=async_browser)
-    browser_tools = {t.name: t for t in browser_toolkit.get_tools()}
-
-    # DuckDuckGo search results tool (no API key)
+async def make_tools_and_browser():
+    pw = await async_playwright().start()
+    browser: Browser = await pw.chromium.launch(headless=True)
+    toolkit = PlayWrightBrowserToolkit.from_browser(async_browser=browser)
+    browser_tools = {t.name: t for t in toolkit.get_tools()}
     search_tool = DuckDuckGoSearchResults(num_results=5)
-
-    return browser_tools, search_tool
+    return browser_tools, search_tool, pw, browser
 
 
 # ----------------------------
-# Dynamic graph builder (N steps)
+# Dynamic graph builder
 # ----------------------------
-def build_graph_dynamic(num_steps: int, execute_step_fn):
+def build_graph_dynamic(n: int, execute_step_fn):
     g = StateGraph(TraceState)
-
-    for i in range(1, num_steps + 1):
+    for i in range(1, n + 1):
         g.add_node(f"step_{i}", execute_step_fn)
-
     g.set_entry_point("step_1")
-    for i in range(1, num_steps):
+    for i in range(1, n):
         g.add_edge(f"step_{i}", f"step_{i+1}")
-    g.add_edge(f"step_{num_steps}", END)
-
+    g.add_edge(f"step_{n}", END)
     return g
 
 
 # ----------------------------
-# Step executor: routes step text -> tools
-# This is intentionally rule-based so step order is exactly the annotator order.
-# Extend these rules as you add more task types.
+# Step executor (FULL step IO saved)
 # ----------------------------
 async def make_execute_step(browser_tools, search_tool, llm: ChatOpenAI):
-    # Common browser tools
     navigate = browser_tools.get("navigate_browser")
     extract_text = browser_tools.get("extract_text")
-
     if navigate is None or extract_text is None:
-        raise RuntimeError("PlayWrightBrowserToolkit tools missing (navigate_browser/extract_text). Check installation.")
+        raise RuntimeError("PlayWrightBrowserToolkit missing navigate_browser/extract_text tools.")
 
     async def execute_step(state: TraceState) -> TraceState:
-        idx = state.get("step_idx", 0)
+        ensure_state_initialized(state)
+
+        idx = state["step_idx"]
         step_text = state["steps"][idx]
-        state["step_idx"] = idx + 1
-        state.setdefault("scratch", {})
-
-        t = step_text.lower()
         step_no = idx + 1
+        state["step_idx"] = idx + 1
 
-        # ------------- Generic: explicit URL navigation -------------
-        url_m = re.search(r"(https?://\S+)", step_text)
-        if url_m:
-            url = url_m.group(1).rstrip(").,")
-            await navigate.arun({"url": url})
-            state["scratch"][f"step_{step_no}_navigate"] = url
-            return state
+        # FULL step input includes: step text, step index, and selected state context
+        step_input_full = {
+            "step_no": step_no,
+            "step_text": step_text,
+            "state_before": {
+                "step_idx": idx,
+                "known_scratch_keys": sorted(list(state["scratch"].keys())),
+                "final_answer": state.get("final_answer"),
+            },
+        }
 
-        # ------------- Task-specific patterns: arXiv AI regulation trace -------------
-        if "go to arxiv.org" in t and "advanced search" in t:
-            await navigate.arun({"url": "https://arxiv.org/search/advanced"})
-            state["scratch"][f"step_{step_no}"] = "opened arXiv advanced search"
-            return state
+        step_log: StepLog = {
+            "step_no": step_no,
+            "step_text": step_text,
+            "step_input_full": step_input_full,   # FULL
+            "step_output_full": {},               # FULL
+            "step_start_ts": time.time(),
+        }
 
-        if 'enter "ai regulation"' in t and "all fields" in t:
-            # We use deterministic URL submission next step; here we just log.
-            state["scratch"][f"step_{step_no}"] = 'noted query="AI regulation", field="All fields"'
-            return state
+        try:
+            t = step_text.lower()
+            full_out: Dict[str, Any] = {}
 
-        if "enter 2022-06-01 and 2022-07-01" in t and "submission date (original)" in t:
-            # Deterministic advanced search URL (acts like submitting the form)
-            url = (
-                "https://arxiv.org/search/advanced?"
-                "advanced=&terms-0-operator=AND&terms-0-term=AI+regulation&terms-0-field=all"
-                "&classification-physics_archives=all&classification-include_cross_list=include"
-                "&date-filter_by=submitted_date_first&date-from_date=2022-06-01&date-to_date=2022-07-01"
-                "&abstracts=show&size=50&order=-announced_date_first"
-            )
-            await navigate.arun({"url": url})
-            page = await extract_text.arun({})
-            state["scratch"]["ai_reg_search_page_text"] = page
-            state["scratch"]["ai_reg_abs_links"] = parse_arxiv_abs_links(page)
-            return state
+            # URL in text
+            url_m = re.search(r"(https?://\S+)", step_text)
+            if url_m:
+                url = url_m.group(1).rstrip(").,")
+                await call_async_tool(state, step_no, "browser.navigate_browser", navigate, {"url": url})
+                full_out = {"action": "navigate", "url": url}
 
-        if "go through the search results to find the article" in t and "fairness in agreement with european values" in t:
-            # Very simple selection: find an abs link whose surrounding text contains the title phrase
-            page = state["scratch"].get("ai_reg_search_page_text", "")
-            if not page:
-                page = await extract_text.arun({})
-                state["scratch"]["ai_reg_search_page_text"] = page
+            elif "go to arxiv.org" in t and "advanced search" in t:
+                url = "https://arxiv.org/search/advanced"
+                await call_async_tool(state, step_no, "browser.navigate_browser", navigate, {"url": url})
+                full_out = {"action": "navigate", "url": url}
 
-            # Heuristic: grab all abs links and just store them; LLM can pick later if needed.
-            abs_links = parse_arxiv_abs_links(page)
-            state["scratch"]["ai_reg_abs_links"] = abs_links
-            state["scratch"][f"step_{step_no}"] = "captured abs links for target selection"
-            return state
-
-        if "note the six words used as labels" in t:
-            # We need the target paper PDF. If we don't have it explicitly, ask LLM to select best abs link.
-            abs_links = state["scratch"].get("ai_reg_abs_links", [])
-            if not abs_links:
-                # fallback: read current page
-                page = await extract_text.arun({})
+            elif "enter 2022-06-01 and 2022-07-01" in t and "submission date (original)" in t:
+                url = (
+                    "https://arxiv.org/search/advanced?"
+                    "advanced=&terms-0-operator=AND&terms-0-term=AI+regulation&terms-0-field=all"
+                    "&date-filter_by=submitted_date_first&date-from_date=2022-06-01&date-to_date=2022-07-01"
+                    "&abstracts=show&size=50&order=-announced_date_first"
+                )
+                await call_async_tool(state, step_no, "browser.navigate_browser", navigate, {"url": url})
+                page = await call_async_tool(state, step_no, "browser.extract_text", extract_text, {}, scratch_key="ai_reg_search_page_text")
                 abs_links = parse_arxiv_abs_links(page)
+                state["scratch"]["ai_reg_abs_links"] = abs_links
+                full_out = {
+                    "action": "arxiv_search",
+                    "url": url,
+                    "abs_links_count": len(abs_links),
+                    "abs_links_full": abs_links,  # FULL
+                }
 
-            # Ask LLM: which abs link corresponds to that title?
-            sys = SystemMessage(content="Pick the single arXiv abs URL most likely matching the title. Return only the URL.")
-            user = HumanMessage(content=f"Title: Fairness in Agreement With European Values: An Interdisciplinary Perspective on AI Regulation\nCandidates:\n{abs_links}")
-            resp = await llm.ainvoke([sys, user])
-            chosen_abs = (resp.content or "").strip()
-            # sanitize to an actual candidate if possible
-            if chosen_abs not in abs_links and abs_links:
-                chosen_abs = abs_links[0]
+            elif "note the six words used as labels" in t:
+                abs_links = state["scratch"].get("ai_reg_abs_links", [])
+                if not abs_links:
+                    page = await call_async_tool(state, step_no, "browser.extract_text", extract_text, {}, scratch_key="ai_reg_search_page_text")
+                    abs_links = parse_arxiv_abs_links(page)
+                    state["scratch"]["ai_reg_abs_links"] = abs_links
 
-            pdf_url = make_arxiv_pdf_url(chosen_abs)
-            ocr_out = ocr_pdf_find_axis_labels.invoke({"pdf_url": pdf_url})
-            labels = await llm_extract_label_words(llm, ocr_out["ocr_text"])
+                sys = SystemMessage(content="Pick the single arXiv abs URL matching the title. Return ONLY the URL.")
+                user = HumanMessage(
+                    content="Title: Fairness in Agreement With European Values: An Interdisciplinary Perspective on AI Regulation\n"
+                            f"Candidates:\n{abs_links}"
+                )
+                resp = await call_llm(state, step_no, llm, [sys, user], scratch_key=f"llm_step_{step_no}_chosen_abs")
+                chosen_abs = (resp.content or "").strip()
+                if chosen_abs not in abs_links and abs_links:
+                    chosen_abs = abs_links[0]
 
-            state["scratch"]["ai_reg_target_abs"] = chosen_abs
-            state["scratch"]["ai_reg_target_pdf"] = pdf_url
-            state["scratch"]["ai_reg_ocr_page_index"] = ocr_out["page_index"]
-            state["scratch"]["ai_reg_label_words"] = labels
+                pdf_url = make_arxiv_pdf_url(chosen_abs)
+
+                ocr_out = call_sync_tool(
+                    state,
+                    step_no,
+                    "ocr_pdf_find_axis_labels",
+                    ocr_pdf_find_axis_labels.invoke,
+                    {
+                        "pdf_url": pdf_url,
+                        "max_pages": 120,
+                        "dpi": 350,
+                        "min_hits_to_accept": 3,
+                        "candidate_pool": 20,
+                        "fallback_stride": 1,
+                    },
+                    scratch_key="ai_reg_ocr_result",
+                )
+
+                ocr_text = ocr_out.get("best_ocr_text", "")
+                labels = await llm_extract_label_words(llm, ocr_text)
+                state["scratch"]["ai_reg_label_words"] = labels
+
+                full_out = {
+                    "action": "ocr_and_extract_labels",
+                    "chosen_abs_full": chosen_abs,
+                    "pdf_url": pdf_url,
+                    "ocr_out_full": ocr_out,      # FULL
+                    "label_words_full": labels,   # FULL
+                }
+
+            elif t.startswith("search the web for"):
+                q = re.search(r"search the web for\s+[“\"](.+?)[”\"]\s*$", step_text, flags=re.IGNORECASE)
+                query = q.group(1) if q else step_text
+                res = await call_async_tool(state, step_no, "search.duckduckgo", search_tool, query, scratch_key=f"search_{step_no}_raw")
+                full_out = {
+                    "action": "search",
+                    "query": query,
+                    "results_full": res,  # FULL
+                    "scratch_key": f"search_{step_no}_raw",
+                }
+
+            elif "note the results" in t or "note the place" in t or "note the zip code" in t or "scroll" in t or "find" in t:
+                page = await call_async_tool(state, step_no, "browser.extract_text", extract_text, {}, scratch_key=f"page_{step_no}_text")
+                full_out = {
+                    "action": "extract_text",
+                    "text_full": page,  # FULL
+                    "scratch_key": f"page_{step_no}_text",
+                }
+
+            else:
+                is_last = (step_no == len(state["steps"]))
+                if "this is the answer" in t or "indicating that" in t or is_last:
+                    sys = SystemMessage(content="Answer strictly in the format requested by the question. No extra text.")
+                    evidence = json.dumps(state["scratch"], ensure_ascii=False, default=str)
+                    user = HumanMessage(content=f"QUESTION:\n{state['task']['Question']}\n\nEVIDENCE:\n{evidence[:300000]}")
+                    resp = await call_llm(state, step_no, llm, [sys, user], scratch_key="final_answer_raw")
+                    ans = (resp.content or "").strip()
+                    state["final_answer"] = ans
+                    full_out = {"action": "finalize", "final_answer": ans}
+                else:
+                    full_out = {"action": "unhandled_step", "step_text": step_text}
+
+            # Persist FULL step output
+            state["scratch"][f"step_{step_no}_input_full"] = step_input_full
+            state["scratch"][f"step_{step_no}_output_full"] = full_out
+
+            step_log["step_output_full"] = full_out
+            step_log["step_end_ts"] = time.time()
+            step_log["step_duration_s"] = float(step_log["step_end_ts"] - step_log["step_start_ts"])
+            state["step_logs"].append(step_log)
+
+            if step_no == len(state["steps"]):
+                finalize_total(state)
+
             return state
 
-        if "go back to arxiv.org" in t:
-            await navigate.arun({"url": "https://arxiv.org"})
-            state["scratch"][f"step_{step_no}"] = "navigated back to arXiv home"
-            return state
-
-        if 'find "physics and society"' in t and "physics and society" in t:
-            # Deterministic category page
-            await navigate.arun({"url": "https://arxiv.org/list/physics.soc-ph/recent"})
-            state["scratch"][f"step_{step_no}"] = "opened physics.soc-ph category"
-            return state
-
-        if 'note that the tag for this category is "physics.soc-ph"' in t:
-            state["scratch"]["physics_society_tag"] = "physics.soc-ph"
-            return state
-
-        if 'enter "physics.soc-ph"' in t and "all fields" in t:
-            state["scratch"][f"step_{step_no}"] = 'noted query="physics.soc-ph", field="All fields"'
-            return state
-
-        if "enter 2016-08-11 and 2016-08-12" in t and "submission date (original)" in t:
-            url = (
-                "https://arxiv.org/search/advanced?"
-                "advanced=&terms-0-operator=AND&terms-0-term=physics.soc-ph&terms-0-field=all"
-                "&classification-physics_archives=all&classification-include_cross_list=include"
-                "&date-filter_by=submitted_date_first&date-from_date=2016-08-11&date-to_date=2016-08-12"
-                "&abstracts=show&size=50&order=-announced_date_first"
-            )
-            await navigate.arun({"url": url})
-            page = await extract_text.arun({})
-            state["scratch"]["phys_search_page_text"] = page
-            state["scratch"]["phys_abs_links"] = parse_arxiv_abs_links(page)
-            return state
-
-        if "search for instances of the six words" in t and "phase transition from egalitarian to hierarchical societies" in t:
-            labels = state["scratch"].get("ai_reg_label_words", [])
-            page = state["scratch"].get("phys_search_page_text", "")
-            if not page:
-                page = await extract_text.arun({})
-                state["scratch"]["phys_search_page_text"] = page
-
-            # naive: find which label word appears in the page text
-            low = page.lower()
-            matched = None
-            for w in labels:
-                if w in low:
-                    matched = w
-                    break
-            state["scratch"]["phys_matched_word"] = matched
-            return state
-
-        # ------------- Task-specific patterns: Finding Nemo / USGS trace -------------
-        if t.startswith("search the web for"):
-            # e.g., Search the web for “finding nemo main character”.
-            q = re.search(r"search the web for\s+[“\"](.+?)[”\"]\s*$", step_text, flags=re.IGNORECASE)
-            query = q.group(1) if q else step_text
-            res = await search_tool.ainvoke(query)
-            state["scratch"][f"search_{step_no}"] = {"query": query, "results": res}
-            return state
-
-        if "click result" in t or "click" in t:
-            # Minimal deterministic behavior: navigate to the first URL in the most recent search results if present
-            # (Annotator says "click result for ...", so we approximate by opening the top hit.)
-            # DuckDuckGoSearchResults returns text; we'll extract first URL-like token.
-            last_search_key = None
-            for k in sorted(state["scratch"].keys(), reverse=True):
-                if k.startswith("search_"):
-                    last_search_key = k
-                    break
-            if last_search_key:
-                blob = state["scratch"][last_search_key]["results"]
-                # find first url in blob
-                m = re.search(r"(https?://\S+)", str(blob))
-                if m:
-                    await navigate.arun({"url": m.group(1).rstrip(").,")})
-                    state["scratch"][f"step_{step_no}_clicked"] = m.group(1)
-                    return state
-            state["scratch"][f"step_{step_no}_clicked"] = "no URL found to click"
-            return state
-
-        if "note the results" in t or "note the place" in t or "note the zip code" in t:
-            page = await extract_text.arun({})
-            state["scratch"][f"page_{step_no}"] = page
-            return state
-
-        # ------------- Finalization -------------
-        # If the step looks like it concludes the answer, or if it's the last step, finalize.
-        is_last_step = (step_no == len(state["steps"]))
-        if "this is the answer" in t or "indicating that" in t or is_last_step:
-            state["final_answer"] = await llm_finalize(llm, state["task"]["Question"], state["scratch"])
-            return state
-
-        # Default: record unhandled step
-        state["scratch"][f"unhandled_step_{step_no}"] = step_text
-        return state
+        except Exception as e:
+            step_log["step_end_ts"] = time.time()
+            step_log["step_duration_s"] = float(step_log["step_end_ts"] - step_log["step_start_ts"])
+            step_log["error"] = f"{type(e).__name__}: {e}"
+            state["step_logs"].append(step_log)
+            finalize_total(state)
+            raise
 
     return execute_step
 
 
 # ----------------------------
-# Runner
+# Run (JSON record/replay)
 # ----------------------------
-async def run(task_json: Dict[str, Any], mode: Literal["record", "replay"]) -> Dict[str, Any]:
+async def run(task_json: Dict[str, Any], mode: Literal["record", "replay"]):
     steps = parse_annotator_steps(task_json)
     task_id = task_json.get("task_id", "thread")
 
-    llm = ChatOpenAI(
-        model=MODEL_NAME,
-        base_url=VLLM_BASE_URL,
-        api_key=VLLM_API_KEY,
-        temperature=0.0,
-    )
+    if mode == "replay":
+        restored = json_ckpt_load(task_id)
+        if restored is None:
+            return {"mode": "replay", "task_id": task_id, "error": f"No JSON checkpoint found at {json_ckpt_path(task_id)}"}
+        return {"mode": "replay", "task_id": task_id, **restored}
 
-    browser_tools, search_tool = await make_tools()
-    execute_step = await make_execute_step(browser_tools, search_tool, llm)
-    graph = build_graph_dynamic(len(steps), execute_step)
+    llm = ChatOpenAI(model=MODEL_NAME, base_url=VLLM_BASE_URL, api_key=VLLM_API_KEY, temperature=0.0)
 
-    checkpointer = SqliteSaver.from_conn_string(SQLITE_PATH)
-    app = graph.compile(checkpointer=checkpointer)
-    config = {"configurable": {"thread_id": task_id}}
+    browser_tools, search_tool, pw, browser = await make_tools_and_browser()
+    try:
+        execute_step = await make_execute_step(browser_tools, search_tool, llm)
+        graph = build_graph_dynamic(len(steps), execute_step)
+        app = graph.compile()
 
-    if mode == "record":
-        init_state: TraceState = {"task": task_json, "steps": steps, "step_idx": 0, "scratch": {}}
-        out = await app.ainvoke(init_state, config=config)
-        return {"mode": "record", "task_id": task_id, "num_steps": len(steps), "final_answer": out.get("final_answer"), "scratch_keys": list((out.get("scratch") or {}).keys())}
+        init_state: TraceState = {
+            "task": task_json,
+            "steps": steps,
+            "step_idx": 0,
+            "scratch": {},
+            "step_logs": [],
+            "tool_call_logs": [],
+            "total_start_ts": time.time(),
+        }
 
-    # replay: load last checkpointed state and return it
-    st = await app.aget_state(config)
-    return {"mode": "replay", "task_id": task_id, "restored_state": st.values}
+        out = await app.ainvoke(init_state)
+
+        if "total_duration_s" not in out:
+            finalize_total(out)
+
+        # Save FULL step IO separately too (easy access)
+        step_io_full = []
+        for sl in out.get("step_logs", []):
+            step_io_full.append(
+                {
+                    "step_no": sl["step_no"],
+                    "step_text": sl["step_text"],
+                    "step_input_full": sl.get("step_input_full", {}),
+                    "step_output_full": sl.get("step_output_full", {}),
+                    "step_duration_s": sl.get("step_duration_s"),
+                }
+            )
+
+        result = {
+            "task_id": task_id,
+            "num_steps": len(steps),
+            "final_answer": out.get("final_answer"),
+            "total_duration_s": out.get("total_duration_s"),
+            "step_logs_full": out.get("step_logs", []),       # FULL
+            "tool_call_logs_full": out.get("tool_call_logs", []),  # FULL
+            "step_io_full": step_io_full,                    # FULL convenience list
+            # Also keep scratch, because you asked "beyond instructions already present"
+            # and scratch contains full page texts, OCR outputs, etc.
+            "scratch_full": out.get("scratch", {}),           # FULL (can be large!)
+        }
+
+        json_ckpt_save(task_id, result)
+        return {"mode": "record", **result}
+    finally:
+        await browser.close()
+        await pw.stop()
 
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--task_json", required=True, help="Path to task JSON file")
+    ap.add_argument("--task_json", required=True)
     ap.add_argument("--mode", choices=["record", "replay"], default="record")
     args = ap.parse_args()
 

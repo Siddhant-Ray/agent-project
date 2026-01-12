@@ -1,1 +1,4 @@
 venv*
+replay/checkpoints*
+replay/downloads
+__pycache__/
