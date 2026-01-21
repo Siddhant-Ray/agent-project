@@ -1,0 +1,1620 @@
+{
+  "task_id": "c61d22de-5f6c-4958-a7f6-5e9707bd3466",
+  "num_steps": 12,
+  "final_answer": null,
+  "total_duration_s": 116.43146634101868,
+  "step_logs_full": [
+    {
+      "step_no": 1,
+      "step_text": "Go to arxiv.org and navigate to the Advanced Search page.",
+      "step_input_full": {
+        "step_no": 1,
+        "step_text": "Go to arxiv.org and navigate to the Advanced Search page.",
+        "state_before": {
+          "step_idx": 0,
+          "known_scratch_keys": [],
+          "final_answer": null
+        }
+      },
+      "step_output_full": {
+        "action": "navigate",
+        "url": "https://arxiv.org/search/advanced"
+      },
+      "step_start_ts": 1768257700.7224314,
+      "step_end_ts": 1768257701.9234655,
+      "step_duration_s": 1.2010340690612793
+    },
+    {
+      "step_no": 2,
+      "step_text": "Enter \"AI regulation\" in the search box and select \"All fields\" from the dropdown.",
+      "step_input_full": {
+        "step_no": 2,
+        "step_text": "Enter \"AI regulation\" in the search box and select \"All fields\" from the dropdown.",
+        "state_before": {
+          "step_idx": 1,
+          "known_scratch_keys": [
+            "step_1_input_full",
+            "step_1_output_full"
+          ],
+          "final_answer": null
+        }
+      },
+      "step_output_full": {
+        "action": "unhandled_step",
+        "step_text": "Enter \"AI regulation\" in the search box and select \"All fields\" from the dropdown."
+      },
+      "step_start_ts": 1768257701.924748,
+      "step_end_ts": 1768257701.9247646,
+      "step_duration_s": 1.6689300537109375e-05
+    },
+    {
+      "step_no": 3,
+      "step_text": "Enter 2022-06-01 and 2022-07-01 into the date inputs, select \"Submission date (original)\", and submit the search.",
+      "step_input_full": {
+        "step_no": 3,
+        "step_text": "Enter 2022-06-01 and 2022-07-01 into the date inputs, select \"Submission date (original)\", and submit the search.",
+        "state_before": {
+          "step_idx": 2,
+          "known_scratch_keys": [
+            "step_1_input_full",
+            "step_1_output_full",
+            "step_2_input_full",
+            "step_2_output_full"
+          ],
+          "final_answer": null
+        }
+      },
+      "step_output_full": {
+        "action": "arxiv_search",
+        "url": "https://arxiv.org/search/advanced?advanced=&terms-0-operator=AND&terms-0-term=AI+regulation&terms-0-field=all&date-filter_by=submitted_date_first&date-from_date=2022-06-01&date-to_date=2022-07-01&abstracts=show&size=50&order=-announced_date_first",
+        "abs_links_count": 0,
+        "abs_links_full": []
+      },
+      "step_start_ts": 1768257701.9251337,
+      "step_end_ts": 1768257702.5523803,
+      "step_duration_s": 0.627246618270874
+    },
+    {
+      "step_no": 4,
+      "step_text": "Go through the search results to find the article that has a figure with three axes and labels on each end of the axes, titled \"Fairness in Agreement With European Values: An Interdisciplinary Perspective on AI Regulation\".",
+      "step_input_full": {
+        "step_no": 4,
+        "step_text": "Go through the search results to find the article that has a figure with three axes and labels on each end of the axes, titled \"Fairness in Agreement With European Values: An Interdisciplinary Perspective on AI Regulation\".",
+        "state_before": {
+          "step_idx": 3,
+          "known_scratch_keys": [
+            "ai_reg_abs_links",
+            "ai_reg_search_page_text",
+            "step_1_input_full",
+            "step_1_output_full",
+            "step_2_input_full",
+            "step_2_output_full",
+            "step_3_input_full",
+            "step_3_output_full"
+          ],
+          "final_answer": null
+        }
+      },
+      "step_output_full": {
+        "action": "extract_text",
+        "text_full": "Advanced Search | arXiv e-print repository Skip to main content We gratefully acknowledge support from the Simons Foundation, member institutions , and all contributors. Donate Help | Advanced Search All fields Title Author Abstract Comments Journal reference ACM classification MSC classification Report number arXiv identifier DOI ORCID arXiv author ID Help pages Full text Search Login Advanced Search Search v0.5.6 released 2020-02-24 Simple Search Whoops! Something went wrong. Please correct errors in the form below. Search term(s) Boolean operator AND OR NOT Search term Field to search Title Author(s) Abstract Comments Journal reference ACM classification MSC classification Report number arXiv identifier Cross-list category DOI ORCID arXiv author ID All fields – Add another term + Search Subject All classifications will be included by default. Computer Science (cs) Economics (econ) Electrical Engineering and Systems Science (eess) Mathematics (math) Physics Subtopic within physics all astro-ph cond-mat gr-qc hep-ex hep-lat hep-ph hep-th math-ph nlin nucl-ex nucl-th physics quant-ph Quantitative Biology (q-bio) Quantitative Finance (q-fin) Statistics (stat) Include cross-listed papers Exclude cross-listed papers Date Not a valid choice All dates Past 12 months Specific year Enter four digit year Date range From to When limiting by date range, the lower bound of the \"from\" date\n                  and the upper bound of the \"to\" date are used. For example,\n                  searching with From: 2012-02 and To: 2013 will search for papers submitted from 2012-02-01 to 2013-12-31 . Submission date (most recent) Submission date (original) Announcement date You may filter on either submission date or announcement date. Note that announcement date supports only year and month granularity. Show abstracts Hide abstracts 25 50 100 200 results per page Include older versions of papers Search Searching by Author Name Using the Author(s) field produces best results for author name searches. For the most precise name search, follow surname(s), forename(s) or surname(s), initial(s) pattern: example Hawking, S or Hawking, Stephen For best results on multiple author names, separate individuals with a ; (semicolon). Example: Jin, D S; Ye, J Author names enclosed in quotes will return only exact matches . For example, \"Stephen Hawking\" will not return matches for Stephen W. Hawking. Diacritic character variants are automatically searched in the Author(s) field. Queries with no punctuation will treat each term independently. Searching by subcategory To search within a subcategory select All fields . A subcategory search can be combined with an author or keyword search by clicking on add another term in advanced search. Tips Wildcards: Use ? to replace a single character or * to replace any number of characters. Can be used in any field, but not in the first character position. See Journal References tips for exceptions. Expressions: TeX expressions can be searched, enclosed in single $ characters. Phrases: Enclose phrases in double quotes for exact matches in title, abstract, and comments. Dates: Sorting by announcement date will use the year and month the original version (v1) of the paper was announced. Sorting by submission date will use the year, month and day the latest version of the paper was submitted. Journal References: If a journal reference search contains a wildcard, matches will be made using wildcard matching as expected. For example, math* will match math , maths , mathematics . If a journal reference search does not contain a wildcard, only exact phrases entered will be matched. For example, math would match math or math and science but not maths or mathematics . All journal reference searches that do not contain a wildcard are literal searches: a search for Physica A will match all papers with journal references containing Physica A , but a search for Physica A, 245 (1997) 181 will only return the paper with journal reference Physica A, 245 (1997) 181 . Search v0.5.6 released 2020-02-24 About Help contact arXiv Click here to contact arXiv Contact subscribe to arXiv mailings Click here to subscribe Subscribe Copyright Privacy Policy Web Accessibility Assistance arXiv Operational Status Get status notifications via email or slack",
+        "scratch_key": "page_4_text"
+      },
+      "step_start_ts": 1768257702.5530279,
+      "step_end_ts": 1768257702.570949,
+      "step_duration_s": 0.01792120933532715
+    },
+    {
+      "step_no": 5,
+      "step_text": "Note the six words used as labels: deontological, egalitarian, localized, standardized, utilitarian, and consequential.",
+      "step_input_full": {
+        "step_no": 5,
+        "step_text": "Note the six words used as labels: deontological, egalitarian, localized, standardized, utilitarian, and consequential.",
+        "state_before": {
+          "step_idx": 4,
+          "known_scratch_keys": [
+            "ai_reg_abs_links",
+            "ai_reg_search_page_text",
+            "page_4_text",
+            "step_1_input_full",
+            "step_1_output_full",
+            "step_2_input_full",
+            "step_2_output_full",
+            "step_3_input_full",
+            "step_3_output_full",
+            "step_4_input_full",
+            "step_4_output_full"
+          ],
+          "final_answer": null
+        }
+      },
+      "step_output_full": {
+        "action": "ocr_and_extract_labels",
+        "chosen_abs_full": "https://arxiv.org/abs/2305.11951",
+        "pdf_url": "https://arxiv.org/pdf/2305.11951.pdf",
+        "ocr_out_full": {
+          "pdf_path": "downloads/paper.pdf",
+          "first_page_index_ge_threshold": null,
+          "best_page_index": 8,
+          "best_hits": 0,
+          "best_found_words": [],
+          "best_ocr_text": "on the other hand the sum of indices is x = —3 for instance, then one can have two\nsolutions that vanish asymptotically, i.e., x; = —2 and —1, but they are not unique: to the\nsolution that goes as —1 one can add a contribution from the one that goes as —2 (times\na polynomial of degree up to one) and take this as the fundamental solution that replaces\nthe previous one, while keeping the condition QY)(s9) at a subtraction point so. In such\ncases, more physical information about the sought solutions has to be provided [63].\n\n3.1 Experimental inputs for the DRs\n\nHereafter we discuss datasets and parameterizations of the inputs for DRs in isospin-zero\nand isospin-two. We point out the main qualitative features observed in phase-shifts and\ninelasticity, shown in Figs. 1, 2, and 3. We take the constrained fits to data (CFD)\nenforcing dispersive relations of Refs. [17-20], that we discuss in more details below.\n\n3.1.1 Isospin-zero phase-shift of pion pairs\n\nWe use the analyses of Refs. [18,19]. As seen from the top-left panel of Fig. 1, the phase-\nshift starts at zero at the pion pair production threshold, and shows a steady increase\nsufficiently below the threshold for kaon pair production, due to the presence of the a\nresonance, which is located deep into the first Riemann sheet, away from the real axis.\nThen, there is a quick increase of the phase-shift, due to the presence of the (980)\nresonance, which is relatively narrow. Another analytical feature in the region ~ 1 GeV is\nthe threshold for kaon pair production. Subsequently, the phase-shift grows steadily; in this\nenergy region there exist the well-established resonances fo(1370), fo(1500) and f9(1710),\nwhich to some extent overlap among themselves (for a recent discussion of f9(1370), see\nRef. [64]).\n\nAbove around 1.42 GeV, Ref. [19] considers different datasets, which are not consistent\namong themselves, providing purely descriptive phase-shift parameterizations separately\nfor each of them, see the top-right panel of Fig. 1. Solution I [65-68] follows from a dataset\nthat extends up to Ey = 1.9 GeV, while the datasets leading to solutions II [69] and III [70]\nextend up to Eg = 1.8 GeV.\n\n3.1.2 Isospin-zero phase-shift of kaon pairs\n\nWe consider the combined analysis of 77 — KK and Kat — Ka employing crossing\nsymmetry of Ref. [20], see also Ref. [71]. There are two possible solutions, B and C, that\nare well compatible, see the bottom-left panel of Fig. 1 (see also comments below). The\ncurve extends up to Eg = 2 GeV. There is a clear structure in the phase-shift in the region\n1.2—2 GeV, that might be in part due to the isoscalar-scalar resonances mentioned above,\nwith the phase-shift decreasing at times.°\n\n3.1.3. Isospin-zero inelasticity\n\nBelow the threshold for their on-shell production, virtual kaon pairs produce off-diagonal\nelements in the two-channel rescattering matrix, with their impact seen in the first term\nin the right-hand side of Eq. (22). They do not produce an absorptive part though, i-e.,\ndo not alter the evolution of the phase motion, and the off-diagonal phase-shift therein is\n\n \n\n°There is an interesting result in Quantum Mechanics, according to which the phase-shift cannot de-\ncrease too quickly in order to respect causality, see [72] and e.g. Ref. [73,74]. In the present situation, we\n0 2\nobserve that —2hc wo) <4 fm, which gives a crude estimate of the minimum range of the potential as\nrequired from the requirement of causality.\n\f",
+          "tried_pages": [
+            8,
+            25,
+            24,
+            20,
+            19,
+            10,
+            9,
+            39,
+            38,
+            37,
+            36,
+            35,
+            34,
+            33,
+            32,
+            31,
+            30,
+            29,
+            28,
+            27,
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            21,
+            22,
+            23,
+            26
+          ],
+          "params": {
+            "max_pages": 120,
+            "dpi": 350,
+            "min_hits_to_accept": 3,
+            "candidate_pool": 20,
+            "fallback_stride": 1
+          }
+        },
+        "label_words_full": []
+      },
+      "step_start_ts": 1768257702.5715287,
+      "step_end_ts": 1768257817.1050024,
+      "step_duration_s": 114.53347373008728
+    },
+    {
+      "step_no": 6,
+      "step_text": "Go back to arxiv.org",
+      "step_input_full": {
+        "step_no": 6,
+        "step_text": "Go back to arxiv.org",
+        "state_before": {
+          "step_idx": 5,
+          "known_scratch_keys": [
+            "ai_reg_abs_links",
+            "ai_reg_label_words",
+            "ai_reg_ocr_result",
+            "ai_reg_search_page_text",
+            "llm_step_5_chosen_abs",
+            "page_4_text",
+            "step_1_input_full",
+            "step_1_output_full",
+            "step_2_input_full",
+            "step_2_output_full",
+            "step_3_input_full",
+            "step_3_output_full",
+            "step_4_input_full",
+            "step_4_output_full",
+            "step_5_input_full",
+            "step_5_output_full"
+          ],
+          "final_answer": null
+        }
+      },
+      "step_output_full": {
+        "action": "unhandled_step",
+        "step_text": "Go back to arxiv.org"
+      },
+      "step_start_ts": 1768257817.107636,
+      "step_end_ts": 1768257817.1076603,
+      "step_duration_s": 2.4318695068359375e-05
+    },
+    {
+      "step_no": 7,
+      "step_text": "Find \"Physics and Society\" and go to the page for the \"Physics and Society\" category.",
+      "step_input_full": {
+        "step_no": 7,
+        "step_text": "Find \"Physics and Society\" and go to the page for the \"Physics and Society\" category.",
+        "state_before": {
+          "step_idx": 6,
+          "known_scratch_keys": [
+            "ai_reg_abs_links",
+            "ai_reg_label_words",
+            "ai_reg_ocr_result",
+            "ai_reg_search_page_text",
+            "llm_step_5_chosen_abs",
+            "page_4_text",
+            "step_1_input_full",
+            "step_1_output_full",
+            "step_2_input_full",
+            "step_2_output_full",
+            "step_3_input_full",
+            "step_3_output_full",
+            "step_4_input_full",
+            "step_4_output_full",
+            "step_5_input_full",
+            "step_5_output_full",
+            "step_6_input_full",
+            "step_6_output_full"
+          ],
+          "final_answer": null
+        }
+      },
+      "step_output_full": {
+        "action": "extract_text",
+        "text_full": "Advanced Search | arXiv e-print repository Skip to main content We gratefully acknowledge support from the Simons Foundation, member institutions , and all contributors. Donate Help | Advanced Search All fields Title Author Abstract Comments Journal reference ACM classification MSC classification Report number arXiv identifier DOI ORCID arXiv author ID Help pages Full text Search Login Advanced Search Search v0.5.6 released 2020-02-24 Simple Search Whoops! Something went wrong. Please correct errors in the form below. Search term(s) Boolean operator AND OR NOT Search term Field to search Title Author(s) Abstract Comments Journal reference ACM classification MSC classification Report number arXiv identifier Cross-list category DOI ORCID arXiv author ID All fields – Add another term + Search Subject All classifications will be included by default. Computer Science (cs) Economics (econ) Electrical Engineering and Systems Science (eess) Mathematics (math) Physics Subtopic within physics all astro-ph cond-mat gr-qc hep-ex hep-lat hep-ph hep-th math-ph nlin nucl-ex nucl-th physics quant-ph Quantitative Biology (q-bio) Quantitative Finance (q-fin) Statistics (stat) Include cross-listed papers Exclude cross-listed papers Date Not a valid choice All dates Past 12 months Specific year Enter four digit year Date range From to When limiting by date range, the lower bound of the \"from\" date\n                  and the upper bound of the \"to\" date are used. For example,\n                  searching with From: 2012-02 and To: 2013 will search for papers submitted from 2012-02-01 to 2013-12-31 . Submission date (most recent) Submission date (original) Announcement date You may filter on either submission date or announcement date. Note that announcement date supports only year and month granularity. Show abstracts Hide abstracts 25 50 100 200 results per page Include older versions of papers Search Searching by Author Name Using the Author(s) field produces best results for author name searches. For the most precise name search, follow surname(s), forename(s) or surname(s), initial(s) pattern: example Hawking, S or Hawking, Stephen For best results on multiple author names, separate individuals with a ; (semicolon). Example: Jin, D S; Ye, J Author names enclosed in quotes will return only exact matches . For example, \"Stephen Hawking\" will not return matches for Stephen W. Hawking. Diacritic character variants are automatically searched in the Author(s) field. Queries with no punctuation will treat each term independently. Searching by subcategory To search within a subcategory select All fields . A subcategory search can be combined with an author or keyword search by clicking on add another term in advanced search. Tips Wildcards: Use ? to replace a single character or * to replace any number of characters. Can be used in any field, but not in the first character position. See Journal References tips for exceptions. Expressions: TeX expressions can be searched, enclosed in single $ characters. Phrases: Enclose phrases in double quotes for exact matches in title, abstract, and comments. Dates: Sorting by announcement date will use the year and month the original version (v1) of the paper was announced. Sorting by submission date will use the year, month and day the latest version of the paper was submitted. Journal References: If a journal reference search contains a wildcard, matches will be made using wildcard matching as expected. For example, math* will match math , maths , mathematics . If a journal reference search does not contain a wildcard, only exact phrases entered will be matched. For example, math would match math or math and science but not maths or mathematics . All journal reference searches that do not contain a wildcard are literal searches: a search for Physica A will match all papers with journal references containing Physica A , but a search for Physica A, 245 (1997) 181 will only return the paper with journal reference Physica A, 245 (1997) 181 . Search v0.5.6 released 2020-02-24 About Help contact arXiv Click here to contact arXiv Contact subscribe to arXiv mailings Click here to subscribe Subscribe Copyright Privacy Policy Web Accessibility Assistance arXiv Operational Status Get status notifications via email or slack",
+        "scratch_key": "page_7_text"
+      },
+      "step_start_ts": 1768257817.107998,
+      "step_end_ts": 1768257817.132512,
+      "step_duration_s": 0.024514198303222656
+    },
+    {
+      "step_no": 8,
+      "step_text": "Note that the tag for this category is \"physics.soc-ph\".",
+      "step_input_full": {
+        "step_no": 8,
+        "step_text": "Note that the tag for this category is \"physics.soc-ph\".",
+        "state_before": {
+          "step_idx": 7,
+          "known_scratch_keys": [
+            "ai_reg_abs_links",
+            "ai_reg_label_words",
+            "ai_reg_ocr_result",
+            "ai_reg_search_page_text",
+            "llm_step_5_chosen_abs",
+            "page_4_text",
+            "page_7_text",
+            "step_1_input_full",
+            "step_1_output_full",
+            "step_2_input_full",
+            "step_2_output_full",
+            "step_3_input_full",
+            "step_3_output_full",
+            "step_4_input_full",
+            "step_4_output_full",
+            "step_5_input_full",
+            "step_5_output_full",
+            "step_6_input_full",
+            "step_6_output_full",
+            "step_7_input_full",
+            "step_7_output_full"
+          ],
+          "final_answer": null
+        }
+      },
+      "step_output_full": {
+        "action": "unhandled_step",
+        "step_text": "Note that the tag for this category is \"physics.soc-ph\"."
+      },
+      "step_start_ts": 1768257817.1330478,
+      "step_end_ts": 1768257817.1330595,
+      "step_duration_s": 1.1682510375976562e-05
+    },
+    {
+      "step_no": 9,
+      "step_text": "Go to the Advanced Search page.",
+      "step_input_full": {
+        "step_no": 9,
+        "step_text": "Go to the Advanced Search page.",
+        "state_before": {
+          "step_idx": 8,
+          "known_scratch_keys": [
+            "ai_reg_abs_links",
+            "ai_reg_label_words",
+            "ai_reg_ocr_result",
+            "ai_reg_search_page_text",
+            "llm_step_5_chosen_abs",
+            "page_4_text",
+            "page_7_text",
+            "step_1_input_full",
+            "step_1_output_full",
+            "step_2_input_full",
+            "step_2_output_full",
+            "step_3_input_full",
+            "step_3_output_full",
+            "step_4_input_full",
+            "step_4_output_full",
+            "step_5_input_full",
+            "step_5_output_full",
+            "step_6_input_full",
+            "step_6_output_full",
+            "step_7_input_full",
+            "step_7_output_full",
+            "step_8_input_full",
+            "step_8_output_full"
+          ],
+          "final_answer": null
+        }
+      },
+      "step_output_full": {
+        "action": "unhandled_step",
+        "step_text": "Go to the Advanced Search page."
+      },
+      "step_start_ts": 1768257817.1333094,
+      "step_end_ts": 1768257817.1333134,
+      "step_duration_s": 4.0531158447265625e-06
+    },
+    {
+      "step_no": 10,
+      "step_text": "Enter \"physics.soc-ph\" in the search box and select \"All fields\" from the dropdown.",
+      "step_input_full": {
+        "step_no": 10,
+        "step_text": "Enter \"physics.soc-ph\" in the search box and select \"All fields\" from the dropdown.",
+        "state_before": {
+          "step_idx": 9,
+          "known_scratch_keys": [
+            "ai_reg_abs_links",
+            "ai_reg_label_words",
+            "ai_reg_ocr_result",
+            "ai_reg_search_page_text",
+            "llm_step_5_chosen_abs",
+            "page_4_text",
+            "page_7_text",
+            "step_1_input_full",
+            "step_1_output_full",
+            "step_2_input_full",
+            "step_2_output_full",
+            "step_3_input_full",
+            "step_3_output_full",
+            "step_4_input_full",
+            "step_4_output_full",
+            "step_5_input_full",
+            "step_5_output_full",
+            "step_6_input_full",
+            "step_6_output_full",
+            "step_7_input_full",
+            "step_7_output_full",
+            "step_8_input_full",
+            "step_8_output_full",
+            "step_9_input_full",
+            "step_9_output_full"
+          ],
+          "final_answer": null
+        }
+      },
+      "step_output_full": {
+        "action": "unhandled_step",
+        "step_text": "Enter \"physics.soc-ph\" in the search box and select \"All fields\" from the dropdown."
+      },
+      "step_start_ts": 1768257817.1335366,
+      "step_end_ts": 1768257817.1335409,
+      "step_duration_s": 4.291534423828125e-06
+    },
+    {
+      "step_no": 11,
+      "step_text": "Enter 2016-08-11 and 2016-08-12 into the date inputs, select \"Submission date (original)\", and submit the search.",
+      "step_input_full": {
+        "step_no": 11,
+        "step_text": "Enter 2016-08-11 and 2016-08-12 into the date inputs, select \"Submission date (original)\", and submit the search.",
+        "state_before": {
+          "step_idx": 10,
+          "known_scratch_keys": [
+            "ai_reg_abs_links",
+            "ai_reg_label_words",
+            "ai_reg_ocr_result",
+            "ai_reg_search_page_text",
+            "llm_step_5_chosen_abs",
+            "page_4_text",
+            "page_7_text",
+            "step_10_input_full",
+            "step_10_output_full",
+            "step_1_input_full",
+            "step_1_output_full",
+            "step_2_input_full",
+            "step_2_output_full",
+            "step_3_input_full",
+            "step_3_output_full",
+            "step_4_input_full",
+            "step_4_output_full",
+            "step_5_input_full",
+            "step_5_output_full",
+            "step_6_input_full",
+            "step_6_output_full",
+            "step_7_input_full",
+            "step_7_output_full",
+            "step_8_input_full",
+            "step_8_output_full",
+            "step_9_input_full",
+            "step_9_output_full"
+          ],
+          "final_answer": null
+        }
+      },
+      "step_output_full": {
+        "action": "unhandled_step",
+        "step_text": "Enter 2016-08-11 and 2016-08-12 into the date inputs, select \"Submission date (original)\", and submit the search."
+      },
+      "step_start_ts": 1768257817.1337724,
+      "step_end_ts": 1768257817.1337767,
+      "step_duration_s": 4.291534423828125e-06
+    },
+    {
+      "step_no": 12,
+      "step_text": "Search for instances of the six words in the results to find the paper titled \"Phase transition from egalitarian to hierarchical societies driven by competition between cognitive and social constraints\", indicating that \"egalitarian\" is the correct answer.",
+      "step_input_full": {
+        "step_no": 12,
+        "step_text": "Search for instances of the six words in the results to find the paper titled \"Phase transition from egalitarian to hierarchical societies driven by competition between cognitive and social constraints\", indicating that \"egalitarian\" is the correct answer.",
+        "state_before": {
+          "step_idx": 11,
+          "known_scratch_keys": [
+            "ai_reg_abs_links",
+            "ai_reg_label_words",
+            "ai_reg_ocr_result",
+            "ai_reg_search_page_text",
+            "llm_step_5_chosen_abs",
+            "page_4_text",
+            "page_7_text",
+            "step_10_input_full",
+            "step_10_output_full",
+            "step_11_input_full",
+            "step_11_output_full",
+            "step_1_input_full",
+            "step_1_output_full",
+            "step_2_input_full",
+            "step_2_output_full",
+            "step_3_input_full",
+            "step_3_output_full",
+            "step_4_input_full",
+            "step_4_output_full",
+            "step_5_input_full",
+            "step_5_output_full",
+            "step_6_input_full",
+            "step_6_output_full",
+            "step_7_input_full",
+            "step_7_output_full",
+            "step_8_input_full",
+            "step_8_output_full",
+            "step_9_input_full",
+            "step_9_output_full"
+          ],
+          "final_answer": null
+        }
+      },
+      "step_output_full": {
+        "action": "extract_text",
+        "text_full": "Advanced Search | arXiv e-print repository Skip to main content We gratefully acknowledge support from the Simons Foundation, member institutions , and all contributors. Donate Help | Advanced Search All fields Title Author Abstract Comments Journal reference ACM classification MSC classification Report number arXiv identifier DOI ORCID arXiv author ID Help pages Full text Search Login Advanced Search Search v0.5.6 released 2020-02-24 Simple Search Whoops! Something went wrong. Please correct errors in the form below. Search term(s) Boolean operator AND OR NOT Search term Field to search Title Author(s) Abstract Comments Journal reference ACM classification MSC classification Report number arXiv identifier Cross-list category DOI ORCID arXiv author ID All fields – Add another term + Search Subject All classifications will be included by default. Computer Science (cs) Economics (econ) Electrical Engineering and Systems Science (eess) Mathematics (math) Physics Subtopic within physics all astro-ph cond-mat gr-qc hep-ex hep-lat hep-ph hep-th math-ph nlin nucl-ex nucl-th physics quant-ph Quantitative Biology (q-bio) Quantitative Finance (q-fin) Statistics (stat) Include cross-listed papers Exclude cross-listed papers Date Not a valid choice All dates Past 12 months Specific year Enter four digit year Date range From to When limiting by date range, the lower bound of the \"from\" date\n                  and the upper bound of the \"to\" date are used. For example,\n                  searching with From: 2012-02 and To: 2013 will search for papers submitted from 2012-02-01 to 2013-12-31 . Submission date (most recent) Submission date (original) Announcement date You may filter on either submission date or announcement date. Note that announcement date supports only year and month granularity. Show abstracts Hide abstracts 25 50 100 200 results per page Include older versions of papers Search Searching by Author Name Using the Author(s) field produces best results for author name searches. For the most precise name search, follow surname(s), forename(s) or surname(s), initial(s) pattern: example Hawking, S or Hawking, Stephen For best results on multiple author names, separate individuals with a ; (semicolon). Example: Jin, D S; Ye, J Author names enclosed in quotes will return only exact matches . For example, \"Stephen Hawking\" will not return matches for Stephen W. Hawking. Diacritic character variants are automatically searched in the Author(s) field. Queries with no punctuation will treat each term independently. Searching by subcategory To search within a subcategory select All fields . A subcategory search can be combined with an author or keyword search by clicking on add another term in advanced search. Tips Wildcards: Use ? to replace a single character or * to replace any number of characters. Can be used in any field, but not in the first character position. See Journal References tips for exceptions. Expressions: TeX expressions can be searched, enclosed in single $ characters. Phrases: Enclose phrases in double quotes for exact matches in title, abstract, and comments. Dates: Sorting by announcement date will use the year and month the original version (v1) of the paper was announced. Sorting by submission date will use the year, month and day the latest version of the paper was submitted. Journal References: If a journal reference search contains a wildcard, matches will be made using wildcard matching as expected. For example, math* will match math , maths , mathematics . If a journal reference search does not contain a wildcard, only exact phrases entered will be matched. For example, math would match math or math and science but not maths or mathematics . All journal reference searches that do not contain a wildcard are literal searches: a search for Physica A will match all papers with journal references containing Physica A , but a search for Physica A, 245 (1997) 181 will only return the paper with journal reference Physica A, 245 (1997) 181 . Search v0.5.6 released 2020-02-24 About Help contact arXiv Click here to contact arXiv Contact subscribe to arXiv mailings Click here to subscribe Subscribe Copyright Privacy Policy Web Accessibility Assistance arXiv Operational Status Get status notifications via email or slack",
+        "scratch_key": "page_12_text"
+      },
+      "step_start_ts": 1768257817.1339755,
+      "step_end_ts": 1768257817.1527243,
+      "step_duration_s": 0.018748760223388672
+    }
+  ],
+  "tool_call_logs_full": [
+    {
+      "step_no": 1,
+      "tool_name": "browser.navigate_browser",
+      "tool_input_full": {
+        "url": "https://arxiv.org/search/advanced"
+      },
+      "tool_start_ts": 1768257700.7225254,
+      "tool_output_full": "Navigating to https://arxiv.org/search/advanced returned status code 200",
+      "tool_end_ts": 1768257701.9234424,
+      "tool_duration_s": 1.2009170055389404
+    },
+    {
+      "step_no": 3,
+      "tool_name": "browser.navigate_browser",
+      "tool_input_full": {
+        "url": "https://arxiv.org/search/advanced?advanced=&terms-0-operator=AND&terms-0-term=AI+regulation&terms-0-field=all&date-filter_by=submitted_date_first&date-from_date=2022-06-01&date-to_date=2022-07-01&abstracts=show&size=50&order=-announced_date_first"
+      },
+      "tool_start_ts": 1768257701.9251392,
+      "tool_output_full": "Navigating to https://arxiv.org/search/advanced?advanced=&terms-0-operator=AND&terms-0-term=AI+regulation&terms-0-field=all&date-filter_by=submitted_date_first&date-from_date=2022-06-01&date-to_date=2022-07-01&abstracts=show&size=50&order=-announced_date_first returned status code 200",
+      "tool_end_ts": 1768257702.4615915,
+      "tool_duration_s": 0.5364522933959961
+    },
+    {
+      "step_no": 3,
+      "tool_name": "browser.extract_text",
+      "tool_input_full": {},
+      "tool_start_ts": 1768257702.4616053,
+      "tool_output_full": "Advanced Search | arXiv e-print repository Skip to main content We gratefully acknowledge support from the Simons Foundation, member institutions , and all contributors. Donate Help | Advanced Search All fields Title Author Abstract Comments Journal reference ACM classification MSC classification Report number arXiv identifier DOI ORCID arXiv author ID Help pages Full text Search Login Advanced Search Search v0.5.6 released 2020-02-24 Simple Search Whoops! Something went wrong. Please correct errors in the form below. Search term(s) Boolean operator AND OR NOT Search term Field to search Title Author(s) Abstract Comments Journal reference ACM classification MSC classification Report number arXiv identifier Cross-list category DOI ORCID arXiv author ID All fields – Add another term + Search Subject All classifications will be included by default. Computer Science (cs) Economics (econ) Electrical Engineering and Systems Science (eess) Mathematics (math) Physics Subtopic within physics all astro-ph cond-mat gr-qc hep-ex hep-lat hep-ph hep-th math-ph nlin nucl-ex nucl-th physics quant-ph Quantitative Biology (q-bio) Quantitative Finance (q-fin) Statistics (stat) Include cross-listed papers Exclude cross-listed papers Date Not a valid choice All dates Past 12 months Specific year Enter four digit year Date range From to When limiting by date range, the lower bound of the \"from\" date\n                  and the upper bound of the \"to\" date are used. For example,\n                  searching with From: 2012-02 and To: 2013 will search for papers submitted from 2012-02-01 to 2013-12-31 . Submission date (most recent) Submission date (original) Announcement date You may filter on either submission date or announcement date. Note that announcement date supports only year and month granularity. Show abstracts Hide abstracts 25 50 100 200 results per page Include older versions of papers Search Searching by Author Name Using the Author(s) field produces best results for author name searches. For the most precise name search, follow surname(s), forename(s) or surname(s), initial(s) pattern: example Hawking, S or Hawking, Stephen For best results on multiple author names, separate individuals with a ; (semicolon). Example: Jin, D S; Ye, J Author names enclosed in quotes will return only exact matches . For example, \"Stephen Hawking\" will not return matches for Stephen W. Hawking. Diacritic character variants are automatically searched in the Author(s) field. Queries with no punctuation will treat each term independently. Searching by subcategory To search within a subcategory select All fields . A subcategory search can be combined with an author or keyword search by clicking on add another term in advanced search. Tips Wildcards: Use ? to replace a single character or * to replace any number of characters. Can be used in any field, but not in the first character position. See Journal References tips for exceptions. Expressions: TeX expressions can be searched, enclosed in single $ characters. Phrases: Enclose phrases in double quotes for exact matches in title, abstract, and comments. Dates: Sorting by announcement date will use the year and month the original version (v1) of the paper was announced. Sorting by submission date will use the year, month and day the latest version of the paper was submitted. Journal References: If a journal reference search contains a wildcard, matches will be made using wildcard matching as expected. For example, math* will match math , maths , mathematics . If a journal reference search does not contain a wildcard, only exact phrases entered will be matched. For example, math would match math or math and science but not maths or mathematics . All journal reference searches that do not contain a wildcard are literal searches: a search for Physica A will match all papers with journal references containing Physica A , but a search for Physica A, 245 (1997) 181 will only return the paper with journal reference Physica A, 245 (1997) 181 . Search v0.5.6 released 2020-02-24 About Help contact arXiv Click here to contact arXiv Contact subscribe to arXiv mailings Click here to subscribe Subscribe Copyright Privacy Policy Web Accessibility Assistance arXiv Operational Status Get status notifications via email or slack",
+      "tool_end_ts": 1768257702.552206,
+      "tool_duration_s": 0.09060072898864746
+    },
+    {
+      "step_no": 4,
+      "tool_name": "browser.extract_text",
+      "tool_input_full": {},
+      "tool_start_ts": 1768257702.55304,
+      "tool_output_full": "Advanced Search | arXiv e-print repository Skip to main content We gratefully acknowledge support from the Simons Foundation, member institutions , and all contributors. Donate Help | Advanced Search All fields Title Author Abstract Comments Journal reference ACM classification MSC classification Report number arXiv identifier DOI ORCID arXiv author ID Help pages Full text Search Login Advanced Search Search v0.5.6 released 2020-02-24 Simple Search Whoops! Something went wrong. Please correct errors in the form below. Search term(s) Boolean operator AND OR NOT Search term Field to search Title Author(s) Abstract Comments Journal reference ACM classification MSC classification Report number arXiv identifier Cross-list category DOI ORCID arXiv author ID All fields – Add another term + Search Subject All classifications will be included by default. Computer Science (cs) Economics (econ) Electrical Engineering and Systems Science (eess) Mathematics (math) Physics Subtopic within physics all astro-ph cond-mat gr-qc hep-ex hep-lat hep-ph hep-th math-ph nlin nucl-ex nucl-th physics quant-ph Quantitative Biology (q-bio) Quantitative Finance (q-fin) Statistics (stat) Include cross-listed papers Exclude cross-listed papers Date Not a valid choice All dates Past 12 months Specific year Enter four digit year Date range From to When limiting by date range, the lower bound of the \"from\" date\n                  and the upper bound of the \"to\" date are used. For example,\n                  searching with From: 2012-02 and To: 2013 will search for papers submitted from 2012-02-01 to 2013-12-31 . Submission date (most recent) Submission date (original) Announcement date You may filter on either submission date or announcement date. Note that announcement date supports only year and month granularity. Show abstracts Hide abstracts 25 50 100 200 results per page Include older versions of papers Search Searching by Author Name Using the Author(s) field produces best results for author name searches. For the most precise name search, follow surname(s), forename(s) or surname(s), initial(s) pattern: example Hawking, S or Hawking, Stephen For best results on multiple author names, separate individuals with a ; (semicolon). Example: Jin, D S; Ye, J Author names enclosed in quotes will return only exact matches . For example, \"Stephen Hawking\" will not return matches for Stephen W. Hawking. Diacritic character variants are automatically searched in the Author(s) field. Queries with no punctuation will treat each term independently. Searching by subcategory To search within a subcategory select All fields . A subcategory search can be combined with an author or keyword search by clicking on add another term in advanced search. Tips Wildcards: Use ? to replace a single character or * to replace any number of characters. Can be used in any field, but not in the first character position. See Journal References tips for exceptions. Expressions: TeX expressions can be searched, enclosed in single $ characters. Phrases: Enclose phrases in double quotes for exact matches in title, abstract, and comments. Dates: Sorting by announcement date will use the year and month the original version (v1) of the paper was announced. Sorting by submission date will use the year, month and day the latest version of the paper was submitted. Journal References: If a journal reference search contains a wildcard, matches will be made using wildcard matching as expected. For example, math* will match math , maths , mathematics . If a journal reference search does not contain a wildcard, only exact phrases entered will be matched. For example, math would match math or math and science but not maths or mathematics . All journal reference searches that do not contain a wildcard are literal searches: a search for Physica A will match all papers with journal references containing Physica A , but a search for Physica A, 245 (1997) 181 will only return the paper with journal reference Physica A, 245 (1997) 181 . Search v0.5.6 released 2020-02-24 About Help contact arXiv Click here to contact arXiv Contact subscribe to arXiv mailings Click here to subscribe Subscribe Copyright Privacy Policy Web Accessibility Assistance arXiv Operational Status Get status notifications via email or slack",
+      "tool_end_ts": 1768257702.5709424,
+      "tool_duration_s": 0.017902374267578125
+    },
+    {
+      "step_no": 5,
+      "tool_name": "browser.extract_text",
+      "tool_input_full": {},
+      "tool_start_ts": 1768257702.5715384,
+      "tool_output_full": "Advanced Search | arXiv e-print repository Skip to main content We gratefully acknowledge support from the Simons Foundation, member institutions , and all contributors. Donate Help | Advanced Search All fields Title Author Abstract Comments Journal reference ACM classification MSC classification Report number arXiv identifier DOI ORCID arXiv author ID Help pages Full text Search Login Advanced Search Search v0.5.6 released 2020-02-24 Simple Search Whoops! Something went wrong. Please correct errors in the form below. Search term(s) Boolean operator AND OR NOT Search term Field to search Title Author(s) Abstract Comments Journal reference ACM classification MSC classification Report number arXiv identifier Cross-list category DOI ORCID arXiv author ID All fields – Add another term + Search Subject All classifications will be included by default. Computer Science (cs) Economics (econ) Electrical Engineering and Systems Science (eess) Mathematics (math) Physics Subtopic within physics all astro-ph cond-mat gr-qc hep-ex hep-lat hep-ph hep-th math-ph nlin nucl-ex nucl-th physics quant-ph Quantitative Biology (q-bio) Quantitative Finance (q-fin) Statistics (stat) Include cross-listed papers Exclude cross-listed papers Date Not a valid choice All dates Past 12 months Specific year Enter four digit year Date range From to When limiting by date range, the lower bound of the \"from\" date\n                  and the upper bound of the \"to\" date are used. For example,\n                  searching with From: 2012-02 and To: 2013 will search for papers submitted from 2012-02-01 to 2013-12-31 . Submission date (most recent) Submission date (original) Announcement date You may filter on either submission date or announcement date. Note that announcement date supports only year and month granularity. Show abstracts Hide abstracts 25 50 100 200 results per page Include older versions of papers Search Searching by Author Name Using the Author(s) field produces best results for author name searches. For the most precise name search, follow surname(s), forename(s) or surname(s), initial(s) pattern: example Hawking, S or Hawking, Stephen For best results on multiple author names, separate individuals with a ; (semicolon). Example: Jin, D S; Ye, J Author names enclosed in quotes will return only exact matches . For example, \"Stephen Hawking\" will not return matches for Stephen W. Hawking. Diacritic character variants are automatically searched in the Author(s) field. Queries with no punctuation will treat each term independently. Searching by subcategory To search within a subcategory select All fields . A subcategory search can be combined with an author or keyword search by clicking on add another term in advanced search. Tips Wildcards: Use ? to replace a single character or * to replace any number of characters. Can be used in any field, but not in the first character position. See Journal References tips for exceptions. Expressions: TeX expressions can be searched, enclosed in single $ characters. Phrases: Enclose phrases in double quotes for exact matches in title, abstract, and comments. Dates: Sorting by announcement date will use the year and month the original version (v1) of the paper was announced. Sorting by submission date will use the year, month and day the latest version of the paper was submitted. Journal References: If a journal reference search contains a wildcard, matches will be made using wildcard matching as expected. For example, math* will match math , maths , mathematics . If a journal reference search does not contain a wildcard, only exact phrases entered will be matched. For example, math would match math or math and science but not maths or mathematics . All journal reference searches that do not contain a wildcard are literal searches: a search for Physica A will match all papers with journal references containing Physica A , but a search for Physica A, 245 (1997) 181 will only return the paper with journal reference Physica A, 245 (1997) 181 . Search v0.5.6 released 2020-02-24 About Help contact arXiv Click here to contact arXiv Contact subscribe to arXiv mailings Click here to subscribe Subscribe Copyright Privacy Policy Web Accessibility Assistance arXiv Operational Status Get status notifications via email or slack",
+      "tool_end_ts": 1768257702.5935261,
+      "tool_duration_s": 0.0219876766204834
+    },
+    {
+      "step_no": 5,
+      "tool_name": "llm.chat",
+      "tool_input_full": {
+        "messages": [
+          "Pick the single arXiv abs URL matching the title. Return ONLY the URL.",
+          "Title: Fairness in Agreement With European Values: An Interdisciplinary Perspective on AI Regulation\nCandidates:\n[]"
+        ]
+      },
+      "tool_start_ts": 1768257702.5936942,
+      "tool_output_full": "https://arxiv.org/abs/2305.11951",
+      "tool_end_ts": 1768257702.7583895,
+      "tool_duration_s": 0.16469526290893555
+    },
+    {
+      "step_no": 5,
+      "tool_name": "ocr_pdf_find_axis_labels",
+      "tool_input_full": {
+        "pdf_url": "https://arxiv.org/pdf/2305.11951.pdf",
+        "max_pages": 120,
+        "dpi": 350,
+        "min_hits_to_accept": 3,
+        "candidate_pool": 20,
+        "fallback_stride": 1
+      },
+      "tool_start_ts": 1768257702.758525,
+      "tool_output_full": {
+        "pdf_path": "downloads/paper.pdf",
+        "first_page_index_ge_threshold": null,
+        "best_page_index": 8,
+        "best_hits": 0,
+        "best_found_words": [],
+        "best_ocr_text": "on the other hand the sum of indices is x = —3 for instance, then one can have two\nsolutions that vanish asymptotically, i.e., x; = —2 and —1, but they are not unique: to the\nsolution that goes as —1 one can add a contribution from the one that goes as —2 (times\na polynomial of degree up to one) and take this as the fundamental solution that replaces\nthe previous one, while keeping the condition QY)(s9) at a subtraction point so. In such\ncases, more physical information about the sought solutions has to be provided [63].\n\n3.1 Experimental inputs for the DRs\n\nHereafter we discuss datasets and parameterizations of the inputs for DRs in isospin-zero\nand isospin-two. We point out the main qualitative features observed in phase-shifts and\ninelasticity, shown in Figs. 1, 2, and 3. We take the constrained fits to data (CFD)\nenforcing dispersive relations of Refs. [17-20], that we discuss in more details below.\n\n3.1.1 Isospin-zero phase-shift of pion pairs\n\nWe use the analyses of Refs. [18,19]. As seen from the top-left panel of Fig. 1, the phase-\nshift starts at zero at the pion pair production threshold, and shows a steady increase\nsufficiently below the threshold for kaon pair production, due to the presence of the a\nresonance, which is located deep into the first Riemann sheet, away from the real axis.\nThen, there is a quick increase of the phase-shift, due to the presence of the (980)\nresonance, which is relatively narrow. Another analytical feature in the region ~ 1 GeV is\nthe threshold for kaon pair production. Subsequently, the phase-shift grows steadily; in this\nenergy region there exist the well-established resonances fo(1370), fo(1500) and f9(1710),\nwhich to some extent overlap among themselves (for a recent discussion of f9(1370), see\nRef. [64]).\n\nAbove around 1.42 GeV, Ref. [19] considers different datasets, which are not consistent\namong themselves, providing purely descriptive phase-shift parameterizations separately\nfor each of them, see the top-right panel of Fig. 1. Solution I [65-68] follows from a dataset\nthat extends up to Ey = 1.9 GeV, while the datasets leading to solutions II [69] and III [70]\nextend up to Eg = 1.8 GeV.\n\n3.1.2 Isospin-zero phase-shift of kaon pairs\n\nWe consider the combined analysis of 77 — KK and Kat — Ka employing crossing\nsymmetry of Ref. [20], see also Ref. [71]. There are two possible solutions, B and C, that\nare well compatible, see the bottom-left panel of Fig. 1 (see also comments below). The\ncurve extends up to Eg = 2 GeV. There is a clear structure in the phase-shift in the region\n1.2—2 GeV, that might be in part due to the isoscalar-scalar resonances mentioned above,\nwith the phase-shift decreasing at times.°\n\n3.1.3. Isospin-zero inelasticity\n\nBelow the threshold for their on-shell production, virtual kaon pairs produce off-diagonal\nelements in the two-channel rescattering matrix, with their impact seen in the first term\nin the right-hand side of Eq. (22). They do not produce an absorptive part though, i-e.,\ndo not alter the evolution of the phase motion, and the off-diagonal phase-shift therein is\n\n \n\n°There is an interesting result in Quantum Mechanics, according to which the phase-shift cannot de-\ncrease too quickly in order to respect causality, see [72] and e.g. Ref. [73,74]. In the present situation, we\n0 2\nobserve that —2hc wo) <4 fm, which gives a crude estimate of the minimum range of the potential as\nrequired from the requirement of causality.\n\f",
+        "tried_pages": [
+          8,
+          25,
+          24,
+          20,
+          19,
+          10,
+          9,
+          39,
+          38,
+          37,
+          36,
+          35,
+          34,
+          33,
+          32,
+          31,
+          30,
+          29,
+          28,
+          27,
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          21,
+          22,
+          23,
+          26
+        ],
+        "params": {
+          "max_pages": 120,
+          "dpi": 350,
+          "min_hits_to_accept": 3,
+          "candidate_pool": 20,
+          "fallback_stride": 1
+        }
+      },
+      "tool_end_ts": 1768257816.7433057,
+      "tool_duration_s": 113.98478078842163
+    },
+    {
+      "step_no": 7,
+      "tool_name": "browser.extract_text",
+      "tool_input_full": {},
+      "tool_start_ts": 1768257817.108005,
+      "tool_output_full": "Advanced Search | arXiv e-print repository Skip to main content We gratefully acknowledge support from the Simons Foundation, member institutions , and all contributors. Donate Help | Advanced Search All fields Title Author Abstract Comments Journal reference ACM classification MSC classification Report number arXiv identifier DOI ORCID arXiv author ID Help pages Full text Search Login Advanced Search Search v0.5.6 released 2020-02-24 Simple Search Whoops! Something went wrong. Please correct errors in the form below. Search term(s) Boolean operator AND OR NOT Search term Field to search Title Author(s) Abstract Comments Journal reference ACM classification MSC classification Report number arXiv identifier Cross-list category DOI ORCID arXiv author ID All fields – Add another term + Search Subject All classifications will be included by default. Computer Science (cs) Economics (econ) Electrical Engineering and Systems Science (eess) Mathematics (math) Physics Subtopic within physics all astro-ph cond-mat gr-qc hep-ex hep-lat hep-ph hep-th math-ph nlin nucl-ex nucl-th physics quant-ph Quantitative Biology (q-bio) Quantitative Finance (q-fin) Statistics (stat) Include cross-listed papers Exclude cross-listed papers Date Not a valid choice All dates Past 12 months Specific year Enter four digit year Date range From to When limiting by date range, the lower bound of the \"from\" date\n                  and the upper bound of the \"to\" date are used. For example,\n                  searching with From: 2012-02 and To: 2013 will search for papers submitted from 2012-02-01 to 2013-12-31 . Submission date (most recent) Submission date (original) Announcement date You may filter on either submission date or announcement date. Note that announcement date supports only year and month granularity. Show abstracts Hide abstracts 25 50 100 200 results per page Include older versions of papers Search Searching by Author Name Using the Author(s) field produces best results for author name searches. For the most precise name search, follow surname(s), forename(s) or surname(s), initial(s) pattern: example Hawking, S or Hawking, Stephen For best results on multiple author names, separate individuals with a ; (semicolon). Example: Jin, D S; Ye, J Author names enclosed in quotes will return only exact matches . For example, \"Stephen Hawking\" will not return matches for Stephen W. Hawking. Diacritic character variants are automatically searched in the Author(s) field. Queries with no punctuation will treat each term independently. Searching by subcategory To search within a subcategory select All fields . A subcategory search can be combined with an author or keyword search by clicking on add another term in advanced search. Tips Wildcards: Use ? to replace a single character or * to replace any number of characters. Can be used in any field, but not in the first character position. See Journal References tips for exceptions. Expressions: TeX expressions can be searched, enclosed in single $ characters. Phrases: Enclose phrases in double quotes for exact matches in title, abstract, and comments. Dates: Sorting by announcement date will use the year and month the original version (v1) of the paper was announced. Sorting by submission date will use the year, month and day the latest version of the paper was submitted. Journal References: If a journal reference search contains a wildcard, matches will be made using wildcard matching as expected. For example, math* will match math , maths , mathematics . If a journal reference search does not contain a wildcard, only exact phrases entered will be matched. For example, math would match math or math and science but not maths or mathematics . All journal reference searches that do not contain a wildcard are literal searches: a search for Physica A will match all papers with journal references containing Physica A , but a search for Physica A, 245 (1997) 181 will only return the paper with journal reference Physica A, 245 (1997) 181 . Search v0.5.6 released 2020-02-24 About Help contact arXiv Click here to contact arXiv Contact subscribe to arXiv mailings Click here to subscribe Subscribe Copyright Privacy Policy Web Accessibility Assistance arXiv Operational Status Get status notifications via email or slack",
+      "tool_end_ts": 1768257817.1325068,
+      "tool_duration_s": 0.024501800537109375
+    },
+    {
+      "step_no": 12,
+      "tool_name": "browser.extract_text",
+      "tool_input_full": {},
+      "tool_start_ts": 1768257817.1339805,
+      "tool_output_full": "Advanced Search | arXiv e-print repository Skip to main content We gratefully acknowledge support from the Simons Foundation, member institutions , and all contributors. Donate Help | Advanced Search All fields Title Author Abstract Comments Journal reference ACM classification MSC classification Report number arXiv identifier DOI ORCID arXiv author ID Help pages Full text Search Login Advanced Search Search v0.5.6 released 2020-02-24 Simple Search Whoops! Something went wrong. Please correct errors in the form below. Search term(s) Boolean operator AND OR NOT Search term Field to search Title Author(s) Abstract Comments Journal reference ACM classification MSC classification Report number arXiv identifier Cross-list category DOI ORCID arXiv author ID All fields – Add another term + Search Subject All classifications will be included by default. Computer Science (cs) Economics (econ) Electrical Engineering and Systems Science (eess) Mathematics (math) Physics Subtopic within physics all astro-ph cond-mat gr-qc hep-ex hep-lat hep-ph hep-th math-ph nlin nucl-ex nucl-th physics quant-ph Quantitative Biology (q-bio) Quantitative Finance (q-fin) Statistics (stat) Include cross-listed papers Exclude cross-listed papers Date Not a valid choice All dates Past 12 months Specific year Enter four digit year Date range From to When limiting by date range, the lower bound of the \"from\" date\n                  and the upper bound of the \"to\" date are used. For example,\n                  searching with From: 2012-02 and To: 2013 will search for papers submitted from 2012-02-01 to 2013-12-31 . Submission date (most recent) Submission date (original) Announcement date You may filter on either submission date or announcement date. Note that announcement date supports only year and month granularity. Show abstracts Hide abstracts 25 50 100 200 results per page Include older versions of papers Search Searching by Author Name Using the Author(s) field produces best results for author name searches. For the most precise name search, follow surname(s), forename(s) or surname(s), initial(s) pattern: example Hawking, S or Hawking, Stephen For best results on multiple author names, separate individuals with a ; (semicolon). Example: Jin, D S; Ye, J Author names enclosed in quotes will return only exact matches . For example, \"Stephen Hawking\" will not return matches for Stephen W. Hawking. Diacritic character variants are automatically searched in the Author(s) field. Queries with no punctuation will treat each term independently. Searching by subcategory To search within a subcategory select All fields . A subcategory search can be combined with an author or keyword search by clicking on add another term in advanced search. Tips Wildcards: Use ? to replace a single character or * to replace any number of characters. Can be used in any field, but not in the first character position. See Journal References tips for exceptions. Expressions: TeX expressions can be searched, enclosed in single $ characters. Phrases: Enclose phrases in double quotes for exact matches in title, abstract, and comments. Dates: Sorting by announcement date will use the year and month the original version (v1) of the paper was announced. Sorting by submission date will use the year, month and day the latest version of the paper was submitted. Journal References: If a journal reference search contains a wildcard, matches will be made using wildcard matching as expected. For example, math* will match math , maths , mathematics . If a journal reference search does not contain a wildcard, only exact phrases entered will be matched. For example, math would match math or math and science but not maths or mathematics . All journal reference searches that do not contain a wildcard are literal searches: a search for Physica A will match all papers with journal references containing Physica A , but a search for Physica A, 245 (1997) 181 will only return the paper with journal reference Physica A, 245 (1997) 181 . Search v0.5.6 released 2020-02-24 About Help contact arXiv Click here to contact arXiv Contact subscribe to arXiv mailings Click here to subscribe Subscribe Copyright Privacy Policy Web Accessibility Assistance arXiv Operational Status Get status notifications via email or slack",
+      "tool_end_ts": 1768257817.1527202,
+      "tool_duration_s": 0.018739700317382812
+    }
+  ],
+  "step_io_full": [
+    {
+      "step_no": 1,
+      "step_text": "Go to arxiv.org and navigate to the Advanced Search page.",
+      "step_input_full": {
+        "step_no": 1,
+        "step_text": "Go to arxiv.org and navigate to the Advanced Search page.",
+        "state_before": {
+          "step_idx": 0,
+          "known_scratch_keys": [],
+          "final_answer": null
+        }
+      },
+      "step_output_full": {
+        "action": "navigate",
+        "url": "https://arxiv.org/search/advanced"
+      },
+      "step_duration_s": 1.2010340690612793
+    },
+    {
+      "step_no": 2,
+      "step_text": "Enter \"AI regulation\" in the search box and select \"All fields\" from the dropdown.",
+      "step_input_full": {
+        "step_no": 2,
+        "step_text": "Enter \"AI regulation\" in the search box and select \"All fields\" from the dropdown.",
+        "state_before": {
+          "step_idx": 1,
+          "known_scratch_keys": [
+            "step_1_input_full",
+            "step_1_output_full"
+          ],
+          "final_answer": null
+        }
+      },
+      "step_output_full": {
+        "action": "unhandled_step",
+        "step_text": "Enter \"AI regulation\" in the search box and select \"All fields\" from the dropdown."
+      },
+      "step_duration_s": 1.6689300537109375e-05
+    },
+    {
+      "step_no": 3,
+      "step_text": "Enter 2022-06-01 and 2022-07-01 into the date inputs, select \"Submission date (original)\", and submit the search.",
+      "step_input_full": {
+        "step_no": 3,
+        "step_text": "Enter 2022-06-01 and 2022-07-01 into the date inputs, select \"Submission date (original)\", and submit the search.",
+        "state_before": {
+          "step_idx": 2,
+          "known_scratch_keys": [
+            "step_1_input_full",
+            "step_1_output_full",
+            "step_2_input_full",
+            "step_2_output_full"
+          ],
+          "final_answer": null
+        }
+      },
+      "step_output_full": {
+        "action": "arxiv_search",
+        "url": "https://arxiv.org/search/advanced?advanced=&terms-0-operator=AND&terms-0-term=AI+regulation&terms-0-field=all&date-filter_by=submitted_date_first&date-from_date=2022-06-01&date-to_date=2022-07-01&abstracts=show&size=50&order=-announced_date_first",
+        "abs_links_count": 0,
+        "abs_links_full": []
+      },
+      "step_duration_s": 0.627246618270874
+    },
+    {
+      "step_no": 4,
+      "step_text": "Go through the search results to find the article that has a figure with three axes and labels on each end of the axes, titled \"Fairness in Agreement With European Values: An Interdisciplinary Perspective on AI Regulation\".",
+      "step_input_full": {
+        "step_no": 4,
+        "step_text": "Go through the search results to find the article that has a figure with three axes and labels on each end of the axes, titled \"Fairness in Agreement With European Values: An Interdisciplinary Perspective on AI Regulation\".",
+        "state_before": {
+          "step_idx": 3,
+          "known_scratch_keys": [
+            "ai_reg_abs_links",
+            "ai_reg_search_page_text",
+            "step_1_input_full",
+            "step_1_output_full",
+            "step_2_input_full",
+            "step_2_output_full",
+            "step_3_input_full",
+            "step_3_output_full"
+          ],
+          "final_answer": null
+        }
+      },
+      "step_output_full": {
+        "action": "extract_text",
+        "text_full": "Advanced Search | arXiv e-print repository Skip to main content We gratefully acknowledge support from the Simons Foundation, member institutions , and all contributors. Donate Help | Advanced Search All fields Title Author Abstract Comments Journal reference ACM classification MSC classification Report number arXiv identifier DOI ORCID arXiv author ID Help pages Full text Search Login Advanced Search Search v0.5.6 released 2020-02-24 Simple Search Whoops! Something went wrong. Please correct errors in the form below. Search term(s) Boolean operator AND OR NOT Search term Field to search Title Author(s) Abstract Comments Journal reference ACM classification MSC classification Report number arXiv identifier Cross-list category DOI ORCID arXiv author ID All fields – Add another term + Search Subject All classifications will be included by default. Computer Science (cs) Economics (econ) Electrical Engineering and Systems Science (eess) Mathematics (math) Physics Subtopic within physics all astro-ph cond-mat gr-qc hep-ex hep-lat hep-ph hep-th math-ph nlin nucl-ex nucl-th physics quant-ph Quantitative Biology (q-bio) Quantitative Finance (q-fin) Statistics (stat) Include cross-listed papers Exclude cross-listed papers Date Not a valid choice All dates Past 12 months Specific year Enter four digit year Date range From to When limiting by date range, the lower bound of the \"from\" date\n                  and the upper bound of the \"to\" date are used. For example,\n                  searching with From: 2012-02 and To: 2013 will search for papers submitted from 2012-02-01 to 2013-12-31 . Submission date (most recent) Submission date (original) Announcement date You may filter on either submission date or announcement date. Note that announcement date supports only year and month granularity. Show abstracts Hide abstracts 25 50 100 200 results per page Include older versions of papers Search Searching by Author Name Using the Author(s) field produces best results for author name searches. For the most precise name search, follow surname(s), forename(s) or surname(s), initial(s) pattern: example Hawking, S or Hawking, Stephen For best results on multiple author names, separate individuals with a ; (semicolon). Example: Jin, D S; Ye, J Author names enclosed in quotes will return only exact matches . For example, \"Stephen Hawking\" will not return matches for Stephen W. Hawking. Diacritic character variants are automatically searched in the Author(s) field. Queries with no punctuation will treat each term independently. Searching by subcategory To search within a subcategory select All fields . A subcategory search can be combined with an author or keyword search by clicking on add another term in advanced search. Tips Wildcards: Use ? to replace a single character or * to replace any number of characters. Can be used in any field, but not in the first character position. See Journal References tips for exceptions. Expressions: TeX expressions can be searched, enclosed in single $ characters. Phrases: Enclose phrases in double quotes for exact matches in title, abstract, and comments. Dates: Sorting by announcement date will use the year and month the original version (v1) of the paper was announced. Sorting by submission date will use the year, month and day the latest version of the paper was submitted. Journal References: If a journal reference search contains a wildcard, matches will be made using wildcard matching as expected. For example, math* will match math , maths , mathematics . If a journal reference search does not contain a wildcard, only exact phrases entered will be matched. For example, math would match math or math and science but not maths or mathematics . All journal reference searches that do not contain a wildcard are literal searches: a search for Physica A will match all papers with journal references containing Physica A , but a search for Physica A, 245 (1997) 181 will only return the paper with journal reference Physica A, 245 (1997) 181 . Search v0.5.6 released 2020-02-24 About Help contact arXiv Click here to contact arXiv Contact subscribe to arXiv mailings Click here to subscribe Subscribe Copyright Privacy Policy Web Accessibility Assistance arXiv Operational Status Get status notifications via email or slack",
+        "scratch_key": "page_4_text"
+      },
+      "step_duration_s": 0.01792120933532715
+    },
+    {
+      "step_no": 5,
+      "step_text": "Note the six words used as labels: deontological, egalitarian, localized, standardized, utilitarian, and consequential.",
+      "step_input_full": {
+        "step_no": 5,
+        "step_text": "Note the six words used as labels: deontological, egalitarian, localized, standardized, utilitarian, and consequential.",
+        "state_before": {
+          "step_idx": 4,
+          "known_scratch_keys": [
+            "ai_reg_abs_links",
+            "ai_reg_search_page_text",
+            "page_4_text",
+            "step_1_input_full",
+            "step_1_output_full",
+            "step_2_input_full",
+            "step_2_output_full",
+            "step_3_input_full",
+            "step_3_output_full",
+            "step_4_input_full",
+            "step_4_output_full"
+          ],
+          "final_answer": null
+        }
+      },
+      "step_output_full": {
+        "action": "ocr_and_extract_labels",
+        "chosen_abs_full": "https://arxiv.org/abs/2305.11951",
+        "pdf_url": "https://arxiv.org/pdf/2305.11951.pdf",
+        "ocr_out_full": {
+          "pdf_path": "downloads/paper.pdf",
+          "first_page_index_ge_threshold": null,
+          "best_page_index": 8,
+          "best_hits": 0,
+          "best_found_words": [],
+          "best_ocr_text": "on the other hand the sum of indices is x = —3 for instance, then one can have two\nsolutions that vanish asymptotically, i.e., x; = —2 and —1, but they are not unique: to the\nsolution that goes as —1 one can add a contribution from the one that goes as —2 (times\na polynomial of degree up to one) and take this as the fundamental solution that replaces\nthe previous one, while keeping the condition QY)(s9) at a subtraction point so. In such\ncases, more physical information about the sought solutions has to be provided [63].\n\n3.1 Experimental inputs for the DRs\n\nHereafter we discuss datasets and parameterizations of the inputs for DRs in isospin-zero\nand isospin-two. We point out the main qualitative features observed in phase-shifts and\ninelasticity, shown in Figs. 1, 2, and 3. We take the constrained fits to data (CFD)\nenforcing dispersive relations of Refs. [17-20], that we discuss in more details below.\n\n3.1.1 Isospin-zero phase-shift of pion pairs\n\nWe use the analyses of Refs. [18,19]. As seen from the top-left panel of Fig. 1, the phase-\nshift starts at zero at the pion pair production threshold, and shows a steady increase\nsufficiently below the threshold for kaon pair production, due to the presence of the a\nresonance, which is located deep into the first Riemann sheet, away from the real axis.\nThen, there is a quick increase of the phase-shift, due to the presence of the (980)\nresonance, which is relatively narrow. Another analytical feature in the region ~ 1 GeV is\nthe threshold for kaon pair production. Subsequently, the phase-shift grows steadily; in this\nenergy region there exist the well-established resonances fo(1370), fo(1500) and f9(1710),\nwhich to some extent overlap among themselves (for a recent discussion of f9(1370), see\nRef. [64]).\n\nAbove around 1.42 GeV, Ref. [19] considers different datasets, which are not consistent\namong themselves, providing purely descriptive phase-shift parameterizations separately\nfor each of them, see the top-right panel of Fig. 1. Solution I [65-68] follows from a dataset\nthat extends up to Ey = 1.9 GeV, while the datasets leading to solutions II [69] and III [70]\nextend up to Eg = 1.8 GeV.\n\n3.1.2 Isospin-zero phase-shift of kaon pairs\n\nWe consider the combined analysis of 77 — KK and Kat — Ka employing crossing\nsymmetry of Ref. [20], see also Ref. [71]. There are two possible solutions, B and C, that\nare well compatible, see the bottom-left panel of Fig. 1 (see also comments below). The\ncurve extends up to Eg = 2 GeV. There is a clear structure in the phase-shift in the region\n1.2—2 GeV, that might be in part due to the isoscalar-scalar resonances mentioned above,\nwith the phase-shift decreasing at times.°\n\n3.1.3. Isospin-zero inelasticity\n\nBelow the threshold for their on-shell production, virtual kaon pairs produce off-diagonal\nelements in the two-channel rescattering matrix, with their impact seen in the first term\nin the right-hand side of Eq. (22). They do not produce an absorptive part though, i-e.,\ndo not alter the evolution of the phase motion, and the off-diagonal phase-shift therein is\n\n \n\n°There is an interesting result in Quantum Mechanics, according to which the phase-shift cannot de-\ncrease too quickly in order to respect causality, see [72] and e.g. Ref. [73,74]. In the present situation, we\n0 2\nobserve that —2hc wo) <4 fm, which gives a crude estimate of the minimum range of the potential as\nrequired from the requirement of causality.\n\f",
+          "tried_pages": [
+            8,
+            25,
+            24,
+            20,
+            19,
+            10,
+            9,
+            39,
+            38,
+            37,
+            36,
+            35,
+            34,
+            33,
+            32,
+            31,
+            30,
+            29,
+            28,
+            27,
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            21,
+            22,
+            23,
+            26
+          ],
+          "params": {
+            "max_pages": 120,
+            "dpi": 350,
+            "min_hits_to_accept": 3,
+            "candidate_pool": 20,
+            "fallback_stride": 1
+          }
+        },
+        "label_words_full": []
+      },
+      "step_duration_s": 114.53347373008728
+    },
+    {
+      "step_no": 6,
+      "step_text": "Go back to arxiv.org",
+      "step_input_full": {
+        "step_no": 6,
+        "step_text": "Go back to arxiv.org",
+        "state_before": {
+          "step_idx": 5,
+          "known_scratch_keys": [
+            "ai_reg_abs_links",
+            "ai_reg_label_words",
+            "ai_reg_ocr_result",
+            "ai_reg_search_page_text",
+            "llm_step_5_chosen_abs",
+            "page_4_text",
+            "step_1_input_full",
+            "step_1_output_full",
+            "step_2_input_full",
+            "step_2_output_full",
+            "step_3_input_full",
+            "step_3_output_full",
+            "step_4_input_full",
+            "step_4_output_full",
+            "step_5_input_full",
+            "step_5_output_full"
+          ],
+          "final_answer": null
+        }
+      },
+      "step_output_full": {
+        "action": "unhandled_step",
+        "step_text": "Go back to arxiv.org"
+      },
+      "step_duration_s": 2.4318695068359375e-05
+    },
+    {
+      "step_no": 7,
+      "step_text": "Find \"Physics and Society\" and go to the page for the \"Physics and Society\" category.",
+      "step_input_full": {
+        "step_no": 7,
+        "step_text": "Find \"Physics and Society\" and go to the page for the \"Physics and Society\" category.",
+        "state_before": {
+          "step_idx": 6,
+          "known_scratch_keys": [
+            "ai_reg_abs_links",
+            "ai_reg_label_words",
+            "ai_reg_ocr_result",
+            "ai_reg_search_page_text",
+            "llm_step_5_chosen_abs",
+            "page_4_text",
+            "step_1_input_full",
+            "step_1_output_full",
+            "step_2_input_full",
+            "step_2_output_full",
+            "step_3_input_full",
+            "step_3_output_full",
+            "step_4_input_full",
+            "step_4_output_full",
+            "step_5_input_full",
+            "step_5_output_full",
+            "step_6_input_full",
+            "step_6_output_full"
+          ],
+          "final_answer": null
+        }
+      },
+      "step_output_full": {
+        "action": "extract_text",
+        "text_full": "Advanced Search | arXiv e-print repository Skip to main content We gratefully acknowledge support from the Simons Foundation, member institutions , and all contributors. Donate Help | Advanced Search All fields Title Author Abstract Comments Journal reference ACM classification MSC classification Report number arXiv identifier DOI ORCID arXiv author ID Help pages Full text Search Login Advanced Search Search v0.5.6 released 2020-02-24 Simple Search Whoops! Something went wrong. Please correct errors in the form below. Search term(s) Boolean operator AND OR NOT Search term Field to search Title Author(s) Abstract Comments Journal reference ACM classification MSC classification Report number arXiv identifier Cross-list category DOI ORCID arXiv author ID All fields – Add another term + Search Subject All classifications will be included by default. Computer Science (cs) Economics (econ) Electrical Engineering and Systems Science (eess) Mathematics (math) Physics Subtopic within physics all astro-ph cond-mat gr-qc hep-ex hep-lat hep-ph hep-th math-ph nlin nucl-ex nucl-th physics quant-ph Quantitative Biology (q-bio) Quantitative Finance (q-fin) Statistics (stat) Include cross-listed papers Exclude cross-listed papers Date Not a valid choice All dates Past 12 months Specific year Enter four digit year Date range From to When limiting by date range, the lower bound of the \"from\" date\n                  and the upper bound of the \"to\" date are used. For example,\n                  searching with From: 2012-02 and To: 2013 will search for papers submitted from 2012-02-01 to 2013-12-31 . Submission date (most recent) Submission date (original) Announcement date You may filter on either submission date or announcement date. Note that announcement date supports only year and month granularity. Show abstracts Hide abstracts 25 50 100 200 results per page Include older versions of papers Search Searching by Author Name Using the Author(s) field produces best results for author name searches. For the most precise name search, follow surname(s), forename(s) or surname(s), initial(s) pattern: example Hawking, S or Hawking, Stephen For best results on multiple author names, separate individuals with a ; (semicolon). Example: Jin, D S; Ye, J Author names enclosed in quotes will return only exact matches . For example, \"Stephen Hawking\" will not return matches for Stephen W. Hawking. Diacritic character variants are automatically searched in the Author(s) field. Queries with no punctuation will treat each term independently. Searching by subcategory To search within a subcategory select All fields . A subcategory search can be combined with an author or keyword search by clicking on add another term in advanced search. Tips Wildcards: Use ? to replace a single character or * to replace any number of characters. Can be used in any field, but not in the first character position. See Journal References tips for exceptions. Expressions: TeX expressions can be searched, enclosed in single $ characters. Phrases: Enclose phrases in double quotes for exact matches in title, abstract, and comments. Dates: Sorting by announcement date will use the year and month the original version (v1) of the paper was announced. Sorting by submission date will use the year, month and day the latest version of the paper was submitted. Journal References: If a journal reference search contains a wildcard, matches will be made using wildcard matching as expected. For example, math* will match math , maths , mathematics . If a journal reference search does not contain a wildcard, only exact phrases entered will be matched. For example, math would match math or math and science but not maths or mathematics . All journal reference searches that do not contain a wildcard are literal searches: a search for Physica A will match all papers with journal references containing Physica A , but a search for Physica A, 245 (1997) 181 will only return the paper with journal reference Physica A, 245 (1997) 181 . Search v0.5.6 released 2020-02-24 About Help contact arXiv Click here to contact arXiv Contact subscribe to arXiv mailings Click here to subscribe Subscribe Copyright Privacy Policy Web Accessibility Assistance arXiv Operational Status Get status notifications via email or slack",
+        "scratch_key": "page_7_text"
+      },
+      "step_duration_s": 0.024514198303222656
+    },
+    {
+      "step_no": 8,
+      "step_text": "Note that the tag for this category is \"physics.soc-ph\".",
+      "step_input_full": {
+        "step_no": 8,
+        "step_text": "Note that the tag for this category is \"physics.soc-ph\".",
+        "state_before": {
+          "step_idx": 7,
+          "known_scratch_keys": [
+            "ai_reg_abs_links",
+            "ai_reg_label_words",
+            "ai_reg_ocr_result",
+            "ai_reg_search_page_text",
+            "llm_step_5_chosen_abs",
+            "page_4_text",
+            "page_7_text",
+            "step_1_input_full",
+            "step_1_output_full",
+            "step_2_input_full",
+            "step_2_output_full",
+            "step_3_input_full",
+            "step_3_output_full",
+            "step_4_input_full",
+            "step_4_output_full",
+            "step_5_input_full",
+            "step_5_output_full",
+            "step_6_input_full",
+            "step_6_output_full",
+            "step_7_input_full",
+            "step_7_output_full"
+          ],
+          "final_answer": null
+        }
+      },
+      "step_output_full": {
+        "action": "unhandled_step",
+        "step_text": "Note that the tag for this category is \"physics.soc-ph\"."
+      },
+      "step_duration_s": 1.1682510375976562e-05
+    },
+    {
+      "step_no": 9,
+      "step_text": "Go to the Advanced Search page.",
+      "step_input_full": {
+        "step_no": 9,
+        "step_text": "Go to the Advanced Search page.",
+        "state_before": {
+          "step_idx": 8,
+          "known_scratch_keys": [
+            "ai_reg_abs_links",
+            "ai_reg_label_words",
+            "ai_reg_ocr_result",
+            "ai_reg_search_page_text",
+            "llm_step_5_chosen_abs",
+            "page_4_text",
+            "page_7_text",
+            "step_1_input_full",
+            "step_1_output_full",
+            "step_2_input_full",
+            "step_2_output_full",
+            "step_3_input_full",
+            "step_3_output_full",
+            "step_4_input_full",
+            "step_4_output_full",
+            "step_5_input_full",
+            "step_5_output_full",
+            "step_6_input_full",
+            "step_6_output_full",
+            "step_7_input_full",
+            "step_7_output_full",
+            "step_8_input_full",
+            "step_8_output_full"
+          ],
+          "final_answer": null
+        }
+      },
+      "step_output_full": {
+        "action": "unhandled_step",
+        "step_text": "Go to the Advanced Search page."
+      },
+      "step_duration_s": 4.0531158447265625e-06
+    },
+    {
+      "step_no": 10,
+      "step_text": "Enter \"physics.soc-ph\" in the search box and select \"All fields\" from the dropdown.",
+      "step_input_full": {
+        "step_no": 10,
+        "step_text": "Enter \"physics.soc-ph\" in the search box and select \"All fields\" from the dropdown.",
+        "state_before": {
+          "step_idx": 9,
+          "known_scratch_keys": [
+            "ai_reg_abs_links",
+            "ai_reg_label_words",
+            "ai_reg_ocr_result",
+            "ai_reg_search_page_text",
+            "llm_step_5_chosen_abs",
+            "page_4_text",
+            "page_7_text",
+            "step_1_input_full",
+            "step_1_output_full",
+            "step_2_input_full",
+            "step_2_output_full",
+            "step_3_input_full",
+            "step_3_output_full",
+            "step_4_input_full",
+            "step_4_output_full",
+            "step_5_input_full",
+            "step_5_output_full",
+            "step_6_input_full",
+            "step_6_output_full",
+            "step_7_input_full",
+            "step_7_output_full",
+            "step_8_input_full",
+            "step_8_output_full",
+            "step_9_input_full",
+            "step_9_output_full"
+          ],
+          "final_answer": null
+        }
+      },
+      "step_output_full": {
+        "action": "unhandled_step",
+        "step_text": "Enter \"physics.soc-ph\" in the search box and select \"All fields\" from the dropdown."
+      },
+      "step_duration_s": 4.291534423828125e-06
+    },
+    {
+      "step_no": 11,
+      "step_text": "Enter 2016-08-11 and 2016-08-12 into the date inputs, select \"Submission date (original)\", and submit the search.",
+      "step_input_full": {
+        "step_no": 11,
+        "step_text": "Enter 2016-08-11 and 2016-08-12 into the date inputs, select \"Submission date (original)\", and submit the search.",
+        "state_before": {
+          "step_idx": 10,
+          "known_scratch_keys": [
+            "ai_reg_abs_links",
+            "ai_reg_label_words",
+            "ai_reg_ocr_result",
+            "ai_reg_search_page_text",
+            "llm_step_5_chosen_abs",
+            "page_4_text",
+            "page_7_text",
+            "step_10_input_full",
+            "step_10_output_full",
+            "step_1_input_full",
+            "step_1_output_full",
+            "step_2_input_full",
+            "step_2_output_full",
+            "step_3_input_full",
+            "step_3_output_full",
+            "step_4_input_full",
+            "step_4_output_full",
+            "step_5_input_full",
+            "step_5_output_full",
+            "step_6_input_full",
+            "step_6_output_full",
+            "step_7_input_full",
+            "step_7_output_full",
+            "step_8_input_full",
+            "step_8_output_full",
+            "step_9_input_full",
+            "step_9_output_full"
+          ],
+          "final_answer": null
+        }
+      },
+      "step_output_full": {
+        "action": "unhandled_step",
+        "step_text": "Enter 2016-08-11 and 2016-08-12 into the date inputs, select \"Submission date (original)\", and submit the search."
+      },
+      "step_duration_s": 4.291534423828125e-06
+    },
+    {
+      "step_no": 12,
+      "step_text": "Search for instances of the six words in the results to find the paper titled \"Phase transition from egalitarian to hierarchical societies driven by competition between cognitive and social constraints\", indicating that \"egalitarian\" is the correct answer.",
+      "step_input_full": {
+        "step_no": 12,
+        "step_text": "Search for instances of the six words in the results to find the paper titled \"Phase transition from egalitarian to hierarchical societies driven by competition between cognitive and social constraints\", indicating that \"egalitarian\" is the correct answer.",
+        "state_before": {
+          "step_idx": 11,
+          "known_scratch_keys": [
+            "ai_reg_abs_links",
+            "ai_reg_label_words",
+            "ai_reg_ocr_result",
+            "ai_reg_search_page_text",
+            "llm_step_5_chosen_abs",
+            "page_4_text",
+            "page_7_text",
+            "step_10_input_full",
+            "step_10_output_full",
+            "step_11_input_full",
+            "step_11_output_full",
+            "step_1_input_full",
+            "step_1_output_full",
+            "step_2_input_full",
+            "step_2_output_full",
+            "step_3_input_full",
+            "step_3_output_full",
+            "step_4_input_full",
+            "step_4_output_full",
+            "step_5_input_full",
+            "step_5_output_full",
+            "step_6_input_full",
+            "step_6_output_full",
+            "step_7_input_full",
+            "step_7_output_full",
+            "step_8_input_full",
+            "step_8_output_full",
+            "step_9_input_full",
+            "step_9_output_full"
+          ],
+          "final_answer": null
+        }
+      },
+      "step_output_full": {
+        "action": "extract_text",
+        "text_full": "Advanced Search | arXiv e-print repository Skip to main content We gratefully acknowledge support from the Simons Foundation, member institutions , and all contributors. Donate Help | Advanced Search All fields Title Author Abstract Comments Journal reference ACM classification MSC classification Report number arXiv identifier DOI ORCID arXiv author ID Help pages Full text Search Login Advanced Search Search v0.5.6 released 2020-02-24 Simple Search Whoops! Something went wrong. Please correct errors in the form below. Search term(s) Boolean operator AND OR NOT Search term Field to search Title Author(s) Abstract Comments Journal reference ACM classification MSC classification Report number arXiv identifier Cross-list category DOI ORCID arXiv author ID All fields – Add another term + Search Subject All classifications will be included by default. Computer Science (cs) Economics (econ) Electrical Engineering and Systems Science (eess) Mathematics (math) Physics Subtopic within physics all astro-ph cond-mat gr-qc hep-ex hep-lat hep-ph hep-th math-ph nlin nucl-ex nucl-th physics quant-ph Quantitative Biology (q-bio) Quantitative Finance (q-fin) Statistics (stat) Include cross-listed papers Exclude cross-listed papers Date Not a valid choice All dates Past 12 months Specific year Enter four digit year Date range From to When limiting by date range, the lower bound of the \"from\" date\n                  and the upper bound of the \"to\" date are used. For example,\n                  searching with From: 2012-02 and To: 2013 will search for papers submitted from 2012-02-01 to 2013-12-31 . Submission date (most recent) Submission date (original) Announcement date You may filter on either submission date or announcement date. Note that announcement date supports only year and month granularity. Show abstracts Hide abstracts 25 50 100 200 results per page Include older versions of papers Search Searching by Author Name Using the Author(s) field produces best results for author name searches. For the most precise name search, follow surname(s), forename(s) or surname(s), initial(s) pattern: example Hawking, S or Hawking, Stephen For best results on multiple author names, separate individuals with a ; (semicolon). Example: Jin, D S; Ye, J Author names enclosed in quotes will return only exact matches . For example, \"Stephen Hawking\" will not return matches for Stephen W. Hawking. Diacritic character variants are automatically searched in the Author(s) field. Queries with no punctuation will treat each term independently. Searching by subcategory To search within a subcategory select All fields . A subcategory search can be combined with an author or keyword search by clicking on add another term in advanced search. Tips Wildcards: Use ? to replace a single character or * to replace any number of characters. Can be used in any field, but not in the first character position. See Journal References tips for exceptions. Expressions: TeX expressions can be searched, enclosed in single $ characters. Phrases: Enclose phrases in double quotes for exact matches in title, abstract, and comments. Dates: Sorting by announcement date will use the year and month the original version (v1) of the paper was announced. Sorting by submission date will use the year, month and day the latest version of the paper was submitted. Journal References: If a journal reference search contains a wildcard, matches will be made using wildcard matching as expected. For example, math* will match math , maths , mathematics . If a journal reference search does not contain a wildcard, only exact phrases entered will be matched. For example, math would match math or math and science but not maths or mathematics . All journal reference searches that do not contain a wildcard are literal searches: a search for Physica A will match all papers with journal references containing Physica A , but a search for Physica A, 245 (1997) 181 will only return the paper with journal reference Physica A, 245 (1997) 181 . Search v0.5.6 released 2020-02-24 About Help contact arXiv Click here to contact arXiv Contact subscribe to arXiv mailings Click here to subscribe Subscribe Copyright Privacy Policy Web Accessibility Assistance arXiv Operational Status Get status notifications via email or slack",
+        "scratch_key": "page_12_text"
+      },
+      "step_duration_s": 0.018748760223388672
+    }
+  ],
+  "scratch_full": {
+    "step_1_input_full": {
+      "step_no": 1,
+      "step_text": "Go to arxiv.org and navigate to the Advanced Search page.",
+      "state_before": {
+        "step_idx": 0,
+        "known_scratch_keys": [],
+        "final_answer": null
+      }
+    },
+    "step_1_output_full": {
+      "action": "navigate",
+      "url": "https://arxiv.org/search/advanced"
+    },
+    "step_2_input_full": {
+      "step_no": 2,
+      "step_text": "Enter \"AI regulation\" in the search box and select \"All fields\" from the dropdown.",
+      "state_before": {
+        "step_idx": 1,
+        "known_scratch_keys": [
+          "step_1_input_full",
+          "step_1_output_full"
+        ],
+        "final_answer": null
+      }
+    },
+    "step_2_output_full": {
+      "action": "unhandled_step",
+      "step_text": "Enter \"AI regulation\" in the search box and select \"All fields\" from the dropdown."
+    },
+    "ai_reg_search_page_text": "Advanced Search | arXiv e-print repository Skip to main content We gratefully acknowledge support from the Simons Foundation, member institutions , and all contributors. Donate Help | Advanced Search All fields Title Author Abstract Comments Journal reference ACM classification MSC classification Report number arXiv identifier DOI ORCID arXiv author ID Help pages Full text Search Login Advanced Search Search v0.5.6 released 2020-02-24 Simple Search Whoops! Something went wrong. Please correct errors in the form below. Search term(s) Boolean operator AND OR NOT Search term Field to search Title Author(s) Abstract Comments Journal reference ACM classification MSC classification Report number arXiv identifier Cross-list category DOI ORCID arXiv author ID All fields – Add another term + Search Subject All classifications will be included by default. Computer Science (cs) Economics (econ) Electrical Engineering and Systems Science (eess) Mathematics (math) Physics Subtopic within physics all astro-ph cond-mat gr-qc hep-ex hep-lat hep-ph hep-th math-ph nlin nucl-ex nucl-th physics quant-ph Quantitative Biology (q-bio) Quantitative Finance (q-fin) Statistics (stat) Include cross-listed papers Exclude cross-listed papers Date Not a valid choice All dates Past 12 months Specific year Enter four digit year Date range From to When limiting by date range, the lower bound of the \"from\" date\n                  and the upper bound of the \"to\" date are used. For example,\n                  searching with From: 2012-02 and To: 2013 will search for papers submitted from 2012-02-01 to 2013-12-31 . Submission date (most recent) Submission date (original) Announcement date You may filter on either submission date or announcement date. Note that announcement date supports only year and month granularity. Show abstracts Hide abstracts 25 50 100 200 results per page Include older versions of papers Search Searching by Author Name Using the Author(s) field produces best results for author name searches. For the most precise name search, follow surname(s), forename(s) or surname(s), initial(s) pattern: example Hawking, S or Hawking, Stephen For best results on multiple author names, separate individuals with a ; (semicolon). Example: Jin, D S; Ye, J Author names enclosed in quotes will return only exact matches . For example, \"Stephen Hawking\" will not return matches for Stephen W. Hawking. Diacritic character variants are automatically searched in the Author(s) field. Queries with no punctuation will treat each term independently. Searching by subcategory To search within a subcategory select All fields . A subcategory search can be combined with an author or keyword search by clicking on add another term in advanced search. Tips Wildcards: Use ? to replace a single character or * to replace any number of characters. Can be used in any field, but not in the first character position. See Journal References tips for exceptions. Expressions: TeX expressions can be searched, enclosed in single $ characters. Phrases: Enclose phrases in double quotes for exact matches in title, abstract, and comments. Dates: Sorting by announcement date will use the year and month the original version (v1) of the paper was announced. Sorting by submission date will use the year, month and day the latest version of the paper was submitted. Journal References: If a journal reference search contains a wildcard, matches will be made using wildcard matching as expected. For example, math* will match math , maths , mathematics . If a journal reference search does not contain a wildcard, only exact phrases entered will be matched. For example, math would match math or math and science but not maths or mathematics . All journal reference searches that do not contain a wildcard are literal searches: a search for Physica A will match all papers with journal references containing Physica A , but a search for Physica A, 245 (1997) 181 will only return the paper with journal reference Physica A, 245 (1997) 181 . Search v0.5.6 released 2020-02-24 About Help contact arXiv Click here to contact arXiv Contact subscribe to arXiv mailings Click here to subscribe Subscribe Copyright Privacy Policy Web Accessibility Assistance arXiv Operational Status Get status notifications via email or slack",
+    "ai_reg_abs_links": [],
+    "step_3_input_full": {
+      "step_no": 3,
+      "step_text": "Enter 2022-06-01 and 2022-07-01 into the date inputs, select \"Submission date (original)\", and submit the search.",
+      "state_before": {
+        "step_idx": 2,
+        "known_scratch_keys": [
+          "step_1_input_full",
+          "step_1_output_full",
+          "step_2_input_full",
+          "step_2_output_full"
+        ],
+        "final_answer": null
+      }
+    },
+    "step_3_output_full": {
+      "action": "arxiv_search",
+      "url": "https://arxiv.org/search/advanced?advanced=&terms-0-operator=AND&terms-0-term=AI+regulation&terms-0-field=all&date-filter_by=submitted_date_first&date-from_date=2022-06-01&date-to_date=2022-07-01&abstracts=show&size=50&order=-announced_date_first",
+      "abs_links_count": 0,
+      "abs_links_full": []
+    },
+    "page_4_text": "Advanced Search | arXiv e-print repository Skip to main content We gratefully acknowledge support from the Simons Foundation, member institutions , and all contributors. Donate Help | Advanced Search All fields Title Author Abstract Comments Journal reference ACM classification MSC classification Report number arXiv identifier DOI ORCID arXiv author ID Help pages Full text Search Login Advanced Search Search v0.5.6 released 2020-02-24 Simple Search Whoops! Something went wrong. Please correct errors in the form below. Search term(s) Boolean operator AND OR NOT Search term Field to search Title Author(s) Abstract Comments Journal reference ACM classification MSC classification Report number arXiv identifier Cross-list category DOI ORCID arXiv author ID All fields – Add another term + Search Subject All classifications will be included by default. Computer Science (cs) Economics (econ) Electrical Engineering and Systems Science (eess) Mathematics (math) Physics Subtopic within physics all astro-ph cond-mat gr-qc hep-ex hep-lat hep-ph hep-th math-ph nlin nucl-ex nucl-th physics quant-ph Quantitative Biology (q-bio) Quantitative Finance (q-fin) Statistics (stat) Include cross-listed papers Exclude cross-listed papers Date Not a valid choice All dates Past 12 months Specific year Enter four digit year Date range From to When limiting by date range, the lower bound of the \"from\" date\n                  and the upper bound of the \"to\" date are used. For example,\n                  searching with From: 2012-02 and To: 2013 will search for papers submitted from 2012-02-01 to 2013-12-31 . Submission date (most recent) Submission date (original) Announcement date You may filter on either submission date or announcement date. Note that announcement date supports only year and month granularity. Show abstracts Hide abstracts 25 50 100 200 results per page Include older versions of papers Search Searching by Author Name Using the Author(s) field produces best results for author name searches. For the most precise name search, follow surname(s), forename(s) or surname(s), initial(s) pattern: example Hawking, S or Hawking, Stephen For best results on multiple author names, separate individuals with a ; (semicolon). Example: Jin, D S; Ye, J Author names enclosed in quotes will return only exact matches . For example, \"Stephen Hawking\" will not return matches for Stephen W. Hawking. Diacritic character variants are automatically searched in the Author(s) field. Queries with no punctuation will treat each term independently. Searching by subcategory To search within a subcategory select All fields . A subcategory search can be combined with an author or keyword search by clicking on add another term in advanced search. Tips Wildcards: Use ? to replace a single character or * to replace any number of characters. Can be used in any field, but not in the first character position. See Journal References tips for exceptions. Expressions: TeX expressions can be searched, enclosed in single $ characters. Phrases: Enclose phrases in double quotes for exact matches in title, abstract, and comments. Dates: Sorting by announcement date will use the year and month the original version (v1) of the paper was announced. Sorting by submission date will use the year, month and day the latest version of the paper was submitted. Journal References: If a journal reference search contains a wildcard, matches will be made using wildcard matching as expected. For example, math* will match math , maths , mathematics . If a journal reference search does not contain a wildcard, only exact phrases entered will be matched. For example, math would match math or math and science but not maths or mathematics . All journal reference searches that do not contain a wildcard are literal searches: a search for Physica A will match all papers with journal references containing Physica A , but a search for Physica A, 245 (1997) 181 will only return the paper with journal reference Physica A, 245 (1997) 181 . Search v0.5.6 released 2020-02-24 About Help contact arXiv Click here to contact arXiv Contact subscribe to arXiv mailings Click here to subscribe Subscribe Copyright Privacy Policy Web Accessibility Assistance arXiv Operational Status Get status notifications via email or slack",
+    "step_4_input_full": {
+      "step_no": 4,
+      "step_text": "Go through the search results to find the article that has a figure with three axes and labels on each end of the axes, titled \"Fairness in Agreement With European Values: An Interdisciplinary Perspective on AI Regulation\".",
+      "state_before": {
+        "step_idx": 3,
+        "known_scratch_keys": [
+          "ai_reg_abs_links",
+          "ai_reg_search_page_text",
+          "step_1_input_full",
+          "step_1_output_full",
+          "step_2_input_full",
+          "step_2_output_full",
+          "step_3_input_full",
+          "step_3_output_full"
+        ],
+        "final_answer": null
+      }
+    },
+    "step_4_output_full": {
+      "action": "extract_text",
+      "text_full": "Advanced Search | arXiv e-print repository Skip to main content We gratefully acknowledge support from the Simons Foundation, member institutions , and all contributors. Donate Help | Advanced Search All fields Title Author Abstract Comments Journal reference ACM classification MSC classification Report number arXiv identifier DOI ORCID arXiv author ID Help pages Full text Search Login Advanced Search Search v0.5.6 released 2020-02-24 Simple Search Whoops! Something went wrong. Please correct errors in the form below. Search term(s) Boolean operator AND OR NOT Search term Field to search Title Author(s) Abstract Comments Journal reference ACM classification MSC classification Report number arXiv identifier Cross-list category DOI ORCID arXiv author ID All fields – Add another term + Search Subject All classifications will be included by default. Computer Science (cs) Economics (econ) Electrical Engineering and Systems Science (eess) Mathematics (math) Physics Subtopic within physics all astro-ph cond-mat gr-qc hep-ex hep-lat hep-ph hep-th math-ph nlin nucl-ex nucl-th physics quant-ph Quantitative Biology (q-bio) Quantitative Finance (q-fin) Statistics (stat) Include cross-listed papers Exclude cross-listed papers Date Not a valid choice All dates Past 12 months Specific year Enter four digit year Date range From to When limiting by date range, the lower bound of the \"from\" date\n                  and the upper bound of the \"to\" date are used. For example,\n                  searching with From: 2012-02 and To: 2013 will search for papers submitted from 2012-02-01 to 2013-12-31 . Submission date (most recent) Submission date (original) Announcement date You may filter on either submission date or announcement date. Note that announcement date supports only year and month granularity. Show abstracts Hide abstracts 25 50 100 200 results per page Include older versions of papers Search Searching by Author Name Using the Author(s) field produces best results for author name searches. For the most precise name search, follow surname(s), forename(s) or surname(s), initial(s) pattern: example Hawking, S or Hawking, Stephen For best results on multiple author names, separate individuals with a ; (semicolon). Example: Jin, D S; Ye, J Author names enclosed in quotes will return only exact matches . For example, \"Stephen Hawking\" will not return matches for Stephen W. Hawking. Diacritic character variants are automatically searched in the Author(s) field. Queries with no punctuation will treat each term independently. Searching by subcategory To search within a subcategory select All fields . A subcategory search can be combined with an author or keyword search by clicking on add another term in advanced search. Tips Wildcards: Use ? to replace a single character or * to replace any number of characters. Can be used in any field, but not in the first character position. See Journal References tips for exceptions. Expressions: TeX expressions can be searched, enclosed in single $ characters. Phrases: Enclose phrases in double quotes for exact matches in title, abstract, and comments. Dates: Sorting by announcement date will use the year and month the original version (v1) of the paper was announced. Sorting by submission date will use the year, month and day the latest version of the paper was submitted. Journal References: If a journal reference search contains a wildcard, matches will be made using wildcard matching as expected. For example, math* will match math , maths , mathematics . If a journal reference search does not contain a wildcard, only exact phrases entered will be matched. For example, math would match math or math and science but not maths or mathematics . All journal reference searches that do not contain a wildcard are literal searches: a search for Physica A will match all papers with journal references containing Physica A , but a search for Physica A, 245 (1997) 181 will only return the paper with journal reference Physica A, 245 (1997) 181 . Search v0.5.6 released 2020-02-24 About Help contact arXiv Click here to contact arXiv Contact subscribe to arXiv mailings Click here to subscribe Subscribe Copyright Privacy Policy Web Accessibility Assistance arXiv Operational Status Get status notifications via email or slack",
+      "scratch_key": "page_4_text"
+    },
+    "llm_step_5_chosen_abs": "https://arxiv.org/abs/2305.11951",
+    "ai_reg_ocr_result": {
+      "pdf_path": "downloads/paper.pdf",
+      "first_page_index_ge_threshold": null,
+      "best_page_index": 8,
+      "best_hits": 0,
+      "best_found_words": [],
+      "best_ocr_text": "on the other hand the sum of indices is x = —3 for instance, then one can have two\nsolutions that vanish asymptotically, i.e., x; = —2 and —1, but they are not unique: to the\nsolution that goes as —1 one can add a contribution from the one that goes as —2 (times\na polynomial of degree up to one) and take this as the fundamental solution that replaces\nthe previous one, while keeping the condition QY)(s9) at a subtraction point so. In such\ncases, more physical information about the sought solutions has to be provided [63].\n\n3.1 Experimental inputs for the DRs\n\nHereafter we discuss datasets and parameterizations of the inputs for DRs in isospin-zero\nand isospin-two. We point out the main qualitative features observed in phase-shifts and\ninelasticity, shown in Figs. 1, 2, and 3. We take the constrained fits to data (CFD)\nenforcing dispersive relations of Refs. [17-20], that we discuss in more details below.\n\n3.1.1 Isospin-zero phase-shift of pion pairs\n\nWe use the analyses of Refs. [18,19]. As seen from the top-left panel of Fig. 1, the phase-\nshift starts at zero at the pion pair production threshold, and shows a steady increase\nsufficiently below the threshold for kaon pair production, due to the presence of the a\nresonance, which is located deep into the first Riemann sheet, away from the real axis.\nThen, there is a quick increase of the phase-shift, due to the presence of the (980)\nresonance, which is relatively narrow. Another analytical feature in the region ~ 1 GeV is\nthe threshold for kaon pair production. Subsequently, the phase-shift grows steadily; in this\nenergy region there exist the well-established resonances fo(1370), fo(1500) and f9(1710),\nwhich to some extent overlap among themselves (for a recent discussion of f9(1370), see\nRef. [64]).\n\nAbove around 1.42 GeV, Ref. [19] considers different datasets, which are not consistent\namong themselves, providing purely descriptive phase-shift parameterizations separately\nfor each of them, see the top-right panel of Fig. 1. Solution I [65-68] follows from a dataset\nthat extends up to Ey = 1.9 GeV, while the datasets leading to solutions II [69] and III [70]\nextend up to Eg = 1.8 GeV.\n\n3.1.2 Isospin-zero phase-shift of kaon pairs\n\nWe consider the combined analysis of 77 — KK and Kat — Ka employing crossing\nsymmetry of Ref. [20], see also Ref. [71]. There are two possible solutions, B and C, that\nare well compatible, see the bottom-left panel of Fig. 1 (see also comments below). The\ncurve extends up to Eg = 2 GeV. There is a clear structure in the phase-shift in the region\n1.2—2 GeV, that might be in part due to the isoscalar-scalar resonances mentioned above,\nwith the phase-shift decreasing at times.°\n\n3.1.3. Isospin-zero inelasticity\n\nBelow the threshold for their on-shell production, virtual kaon pairs produce off-diagonal\nelements in the two-channel rescattering matrix, with their impact seen in the first term\nin the right-hand side of Eq. (22). They do not produce an absorptive part though, i-e.,\ndo not alter the evolution of the phase motion, and the off-diagonal phase-shift therein is\n\n \n\n°There is an interesting result in Quantum Mechanics, according to which the phase-shift cannot de-\ncrease too quickly in order to respect causality, see [72] and e.g. Ref. [73,74]. In the present situation, we\n0 2\nobserve that —2hc wo) <4 fm, which gives a crude estimate of the minimum range of the potential as\nrequired from the requirement of causality.\n\f",
+      "tried_pages": [
+        8,
+        25,
+        24,
+        20,
+        19,
+        10,
+        9,
+        39,
+        38,
+        37,
+        36,
+        35,
+        34,
+        33,
+        32,
+        31,
+        30,
+        29,
+        28,
+        27,
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        21,
+        22,
+        23,
+        26
+      ],
+      "params": {
+        "max_pages": 120,
+        "dpi": 350,
+        "min_hits_to_accept": 3,
+        "candidate_pool": 20,
+        "fallback_stride": 1
+      }
+    },
+    "ai_reg_label_words": [],
+    "step_5_input_full": {
+      "step_no": 5,
+      "step_text": "Note the six words used as labels: deontological, egalitarian, localized, standardized, utilitarian, and consequential.",
+      "state_before": {
+        "step_idx": 4,
+        "known_scratch_keys": [
+          "ai_reg_abs_links",
+          "ai_reg_search_page_text",
+          "page_4_text",
+          "step_1_input_full",
+          "step_1_output_full",
+          "step_2_input_full",
+          "step_2_output_full",
+          "step_3_input_full",
+          "step_3_output_full",
+          "step_4_input_full",
+          "step_4_output_full"
+        ],
+        "final_answer": null
+      }
+    },
+    "step_5_output_full": {
+      "action": "ocr_and_extract_labels",
+      "chosen_abs_full": "https://arxiv.org/abs/2305.11951",
+      "pdf_url": "https://arxiv.org/pdf/2305.11951.pdf",
+      "ocr_out_full": {
+        "pdf_path": "downloads/paper.pdf",
+        "first_page_index_ge_threshold": null,
+        "best_page_index": 8,
+        "best_hits": 0,
+        "best_found_words": [],
+        "best_ocr_text": "on the other hand the sum of indices is x = —3 for instance, then one can have two\nsolutions that vanish asymptotically, i.e., x; = —2 and —1, but they are not unique: to the\nsolution that goes as —1 one can add a contribution from the one that goes as —2 (times\na polynomial of degree up to one) and take this as the fundamental solution that replaces\nthe previous one, while keeping the condition QY)(s9) at a subtraction point so. In such\ncases, more physical information about the sought solutions has to be provided [63].\n\n3.1 Experimental inputs for the DRs\n\nHereafter we discuss datasets and parameterizations of the inputs for DRs in isospin-zero\nand isospin-two. We point out the main qualitative features observed in phase-shifts and\ninelasticity, shown in Figs. 1, 2, and 3. We take the constrained fits to data (CFD)\nenforcing dispersive relations of Refs. [17-20], that we discuss in more details below.\n\n3.1.1 Isospin-zero phase-shift of pion pairs\n\nWe use the analyses of Refs. [18,19]. As seen from the top-left panel of Fig. 1, the phase-\nshift starts at zero at the pion pair production threshold, and shows a steady increase\nsufficiently below the threshold for kaon pair production, due to the presence of the a\nresonance, which is located deep into the first Riemann sheet, away from the real axis.\nThen, there is a quick increase of the phase-shift, due to the presence of the (980)\nresonance, which is relatively narrow. Another analytical feature in the region ~ 1 GeV is\nthe threshold for kaon pair production. Subsequently, the phase-shift grows steadily; in this\nenergy region there exist the well-established resonances fo(1370), fo(1500) and f9(1710),\nwhich to some extent overlap among themselves (for a recent discussion of f9(1370), see\nRef. [64]).\n\nAbove around 1.42 GeV, Ref. [19] considers different datasets, which are not consistent\namong themselves, providing purely descriptive phase-shift parameterizations separately\nfor each of them, see the top-right panel of Fig. 1. Solution I [65-68] follows from a dataset\nthat extends up to Ey = 1.9 GeV, while the datasets leading to solutions II [69] and III [70]\nextend up to Eg = 1.8 GeV.\n\n3.1.2 Isospin-zero phase-shift of kaon pairs\n\nWe consider the combined analysis of 77 — KK and Kat — Ka employing crossing\nsymmetry of Ref. [20], see also Ref. [71]. There are two possible solutions, B and C, that\nare well compatible, see the bottom-left panel of Fig. 1 (see also comments below). The\ncurve extends up to Eg = 2 GeV. There is a clear structure in the phase-shift in the region\n1.2—2 GeV, that might be in part due to the isoscalar-scalar resonances mentioned above,\nwith the phase-shift decreasing at times.°\n\n3.1.3. Isospin-zero inelasticity\n\nBelow the threshold for their on-shell production, virtual kaon pairs produce off-diagonal\nelements in the two-channel rescattering matrix, with their impact seen in the first term\nin the right-hand side of Eq. (22). They do not produce an absorptive part though, i-e.,\ndo not alter the evolution of the phase motion, and the off-diagonal phase-shift therein is\n\n \n\n°There is an interesting result in Quantum Mechanics, according to which the phase-shift cannot de-\ncrease too quickly in order to respect causality, see [72] and e.g. Ref. [73,74]. In the present situation, we\n0 2\nobserve that —2hc wo) <4 fm, which gives a crude estimate of the minimum range of the potential as\nrequired from the requirement of causality.\n\f",
+        "tried_pages": [
+          8,
+          25,
+          24,
+          20,
+          19,
+          10,
+          9,
+          39,
+          38,
+          37,
+          36,
+          35,
+          34,
+          33,
+          32,
+          31,
+          30,
+          29,
+          28,
+          27,
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          21,
+          22,
+          23,
+          26
+        ],
+        "params": {
+          "max_pages": 120,
+          "dpi": 350,
+          "min_hits_to_accept": 3,
+          "candidate_pool": 20,
+          "fallback_stride": 1
+        }
+      },
+      "label_words_full": []
+    },
+    "step_6_input_full": {
+      "step_no": 6,
+      "step_text": "Go back to arxiv.org",
+      "state_before": {
+        "step_idx": 5,
+        "known_scratch_keys": [
+          "ai_reg_abs_links",
+          "ai_reg_label_words",
+          "ai_reg_ocr_result",
+          "ai_reg_search_page_text",
+          "llm_step_5_chosen_abs",
+          "page_4_text",
+          "step_1_input_full",
+          "step_1_output_full",
+          "step_2_input_full",
+          "step_2_output_full",
+          "step_3_input_full",
+          "step_3_output_full",
+          "step_4_input_full",
+          "step_4_output_full",
+          "step_5_input_full",
+          "step_5_output_full"
+        ],
+        "final_answer": null
+      }
+    },
+    "step_6_output_full": {
+      "action": "unhandled_step",
+      "step_text": "Go back to arxiv.org"
+    },
+    "page_7_text": "Advanced Search | arXiv e-print repository Skip to main content We gratefully acknowledge support from the Simons Foundation, member institutions , and all contributors. Donate Help | Advanced Search All fields Title Author Abstract Comments Journal reference ACM classification MSC classification Report number arXiv identifier DOI ORCID arXiv author ID Help pages Full text Search Login Advanced Search Search v0.5.6 released 2020-02-24 Simple Search Whoops! Something went wrong. Please correct errors in the form below. Search term(s) Boolean operator AND OR NOT Search term Field to search Title Author(s) Abstract Comments Journal reference ACM classification MSC classification Report number arXiv identifier Cross-list category DOI ORCID arXiv author ID All fields – Add another term + Search Subject All classifications will be included by default. Computer Science (cs) Economics (econ) Electrical Engineering and Systems Science (eess) Mathematics (math) Physics Subtopic within physics all astro-ph cond-mat gr-qc hep-ex hep-lat hep-ph hep-th math-ph nlin nucl-ex nucl-th physics quant-ph Quantitative Biology (q-bio) Quantitative Finance (q-fin) Statistics (stat) Include cross-listed papers Exclude cross-listed papers Date Not a valid choice All dates Past 12 months Specific year Enter four digit year Date range From to When limiting by date range, the lower bound of the \"from\" date\n                  and the upper bound of the \"to\" date are used. For example,\n                  searching with From: 2012-02 and To: 2013 will search for papers submitted from 2012-02-01 to 2013-12-31 . Submission date (most recent) Submission date (original) Announcement date You may filter on either submission date or announcement date. Note that announcement date supports only year and month granularity. Show abstracts Hide abstracts 25 50 100 200 results per page Include older versions of papers Search Searching by Author Name Using the Author(s) field produces best results for author name searches. For the most precise name search, follow surname(s), forename(s) or surname(s), initial(s) pattern: example Hawking, S or Hawking, Stephen For best results on multiple author names, separate individuals with a ; (semicolon). Example: Jin, D S; Ye, J Author names enclosed in quotes will return only exact matches . For example, \"Stephen Hawking\" will not return matches for Stephen W. Hawking. Diacritic character variants are automatically searched in the Author(s) field. Queries with no punctuation will treat each term independently. Searching by subcategory To search within a subcategory select All fields . A subcategory search can be combined with an author or keyword search by clicking on add another term in advanced search. Tips Wildcards: Use ? to replace a single character or * to replace any number of characters. Can be used in any field, but not in the first character position. See Journal References tips for exceptions. Expressions: TeX expressions can be searched, enclosed in single $ characters. Phrases: Enclose phrases in double quotes for exact matches in title, abstract, and comments. Dates: Sorting by announcement date will use the year and month the original version (v1) of the paper was announced. Sorting by submission date will use the year, month and day the latest version of the paper was submitted. Journal References: If a journal reference search contains a wildcard, matches will be made using wildcard matching as expected. For example, math* will match math , maths , mathematics . If a journal reference search does not contain a wildcard, only exact phrases entered will be matched. For example, math would match math or math and science but not maths or mathematics . All journal reference searches that do not contain a wildcard are literal searches: a search for Physica A will match all papers with journal references containing Physica A , but a search for Physica A, 245 (1997) 181 will only return the paper with journal reference Physica A, 245 (1997) 181 . Search v0.5.6 released 2020-02-24 About Help contact arXiv Click here to contact arXiv Contact subscribe to arXiv mailings Click here to subscribe Subscribe Copyright Privacy Policy Web Accessibility Assistance arXiv Operational Status Get status notifications via email or slack",
+    "step_7_input_full": {
+      "step_no": 7,
+      "step_text": "Find \"Physics and Society\" and go to the page for the \"Physics and Society\" category.",
+      "state_before": {
+        "step_idx": 6,
+        "known_scratch_keys": [
+          "ai_reg_abs_links",
+          "ai_reg_label_words",
+          "ai_reg_ocr_result",
+          "ai_reg_search_page_text",
+          "llm_step_5_chosen_abs",
+          "page_4_text",
+          "step_1_input_full",
+          "step_1_output_full",
+          "step_2_input_full",
+          "step_2_output_full",
+          "step_3_input_full",
+          "step_3_output_full",
+          "step_4_input_full",
+          "step_4_output_full",
+          "step_5_input_full",
+          "step_5_output_full",
+          "step_6_input_full",
+          "step_6_output_full"
+        ],
+        "final_answer": null
+      }
+    },
+    "step_7_output_full": {
+      "action": "extract_text",
+      "text_full": "Advanced Search | arXiv e-print repository Skip to main content We gratefully acknowledge support from the Simons Foundation, member institutions , and all contributors. Donate Help | Advanced Search All fields Title Author Abstract Comments Journal reference ACM classification MSC classification Report number arXiv identifier DOI ORCID arXiv author ID Help pages Full text Search Login Advanced Search Search v0.5.6 released 2020-02-24 Simple Search Whoops! Something went wrong. Please correct errors in the form below. Search term(s) Boolean operator AND OR NOT Search term Field to search Title Author(s) Abstract Comments Journal reference ACM classification MSC classification Report number arXiv identifier Cross-list category DOI ORCID arXiv author ID All fields – Add another term + Search Subject All classifications will be included by default. Computer Science (cs) Economics (econ) Electrical Engineering and Systems Science (eess) Mathematics (math) Physics Subtopic within physics all astro-ph cond-mat gr-qc hep-ex hep-lat hep-ph hep-th math-ph nlin nucl-ex nucl-th physics quant-ph Quantitative Biology (q-bio) Quantitative Finance (q-fin) Statistics (stat) Include cross-listed papers Exclude cross-listed papers Date Not a valid choice All dates Past 12 months Specific year Enter four digit year Date range From to When limiting by date range, the lower bound of the \"from\" date\n                  and the upper bound of the \"to\" date are used. For example,\n                  searching with From: 2012-02 and To: 2013 will search for papers submitted from 2012-02-01 to 2013-12-31 . Submission date (most recent) Submission date (original) Announcement date You may filter on either submission date or announcement date. Note that announcement date supports only year and month granularity. Show abstracts Hide abstracts 25 50 100 200 results per page Include older versions of papers Search Searching by Author Name Using the Author(s) field produces best results for author name searches. For the most precise name search, follow surname(s), forename(s) or surname(s), initial(s) pattern: example Hawking, S or Hawking, Stephen For best results on multiple author names, separate individuals with a ; (semicolon). Example: Jin, D S; Ye, J Author names enclosed in quotes will return only exact matches . For example, \"Stephen Hawking\" will not return matches for Stephen W. Hawking. Diacritic character variants are automatically searched in the Author(s) field. Queries with no punctuation will treat each term independently. Searching by subcategory To search within a subcategory select All fields . A subcategory search can be combined with an author or keyword search by clicking on add another term in advanced search. Tips Wildcards: Use ? to replace a single character or * to replace any number of characters. Can be used in any field, but not in the first character position. See Journal References tips for exceptions. Expressions: TeX expressions can be searched, enclosed in single $ characters. Phrases: Enclose phrases in double quotes for exact matches in title, abstract, and comments. Dates: Sorting by announcement date will use the year and month the original version (v1) of the paper was announced. Sorting by submission date will use the year, month and day the latest version of the paper was submitted. Journal References: If a journal reference search contains a wildcard, matches will be made using wildcard matching as expected. For example, math* will match math , maths , mathematics . If a journal reference search does not contain a wildcard, only exact phrases entered will be matched. For example, math would match math or math and science but not maths or mathematics . All journal reference searches that do not contain a wildcard are literal searches: a search for Physica A will match all papers with journal references containing Physica A , but a search for Physica A, 245 (1997) 181 will only return the paper with journal reference Physica A, 245 (1997) 181 . Search v0.5.6 released 2020-02-24 About Help contact arXiv Click here to contact arXiv Contact subscribe to arXiv mailings Click here to subscribe Subscribe Copyright Privacy Policy Web Accessibility Assistance arXiv Operational Status Get status notifications via email or slack",
+      "scratch_key": "page_7_text"
+    },
+    "step_8_input_full": {
+      "step_no": 8,
+      "step_text": "Note that the tag for this category is \"physics.soc-ph\".",
+      "state_before": {
+        "step_idx": 7,
+        "known_scratch_keys": [
+          "ai_reg_abs_links",
+          "ai_reg_label_words",
+          "ai_reg_ocr_result",
+          "ai_reg_search_page_text",
+          "llm_step_5_chosen_abs",
+          "page_4_text",
+          "page_7_text",
+          "step_1_input_full",
+          "step_1_output_full",
+          "step_2_input_full",
+          "step_2_output_full",
+          "step_3_input_full",
+          "step_3_output_full",
+          "step_4_input_full",
+          "step_4_output_full",
+          "step_5_input_full",
+          "step_5_output_full",
+          "step_6_input_full",
+          "step_6_output_full",
+          "step_7_input_full",
+          "step_7_output_full"
+        ],
+        "final_answer": null
+      }
+    },
+    "step_8_output_full": {
+      "action": "unhandled_step",
+      "step_text": "Note that the tag for this category is \"physics.soc-ph\"."
+    },
+    "step_9_input_full": {
+      "step_no": 9,
+      "step_text": "Go to the Advanced Search page.",
+      "state_before": {
+        "step_idx": 8,
+        "known_scratch_keys": [
+          "ai_reg_abs_links",
+          "ai_reg_label_words",
+          "ai_reg_ocr_result",
+          "ai_reg_search_page_text",
+          "llm_step_5_chosen_abs",
+          "page_4_text",
+          "page_7_text",
+          "step_1_input_full",
+          "step_1_output_full",
+          "step_2_input_full",
+          "step_2_output_full",
+          "step_3_input_full",
+          "step_3_output_full",
+          "step_4_input_full",
+          "step_4_output_full",
+          "step_5_input_full",
+          "step_5_output_full",
+          "step_6_input_full",
+          "step_6_output_full",
+          "step_7_input_full",
+          "step_7_output_full",
+          "step_8_input_full",
+          "step_8_output_full"
+        ],
+        "final_answer": null
+      }
+    },
+    "step_9_output_full": {
+      "action": "unhandled_step",
+      "step_text": "Go to the Advanced Search page."
+    },
+    "step_10_input_full": {
+      "step_no": 10,
+      "step_text": "Enter \"physics.soc-ph\" in the search box and select \"All fields\" from the dropdown.",
+      "state_before": {
+        "step_idx": 9,
+        "known_scratch_keys": [
+          "ai_reg_abs_links",
+          "ai_reg_label_words",
+          "ai_reg_ocr_result",
+          "ai_reg_search_page_text",
+          "llm_step_5_chosen_abs",
+          "page_4_text",
+          "page_7_text",
+          "step_1_input_full",
+          "step_1_output_full",
+          "step_2_input_full",
+          "step_2_output_full",
+          "step_3_input_full",
+          "step_3_output_full",
+          "step_4_input_full",
+          "step_4_output_full",
+          "step_5_input_full",
+          "step_5_output_full",
+          "step_6_input_full",
+          "step_6_output_full",
+          "step_7_input_full",
+          "step_7_output_full",
+          "step_8_input_full",
+          "step_8_output_full",
+          "step_9_input_full",
+          "step_9_output_full"
+        ],
+        "final_answer": null
+      }
+    },
+    "step_10_output_full": {
+      "action": "unhandled_step",
+      "step_text": "Enter \"physics.soc-ph\" in the search box and select \"All fields\" from the dropdown."
+    },
+    "step_11_input_full": {
+      "step_no": 11,
+      "step_text": "Enter 2016-08-11 and 2016-08-12 into the date inputs, select \"Submission date (original)\", and submit the search.",
+      "state_before": {
+        "step_idx": 10,
+        "known_scratch_keys": [
+          "ai_reg_abs_links",
+          "ai_reg_label_words",
+          "ai_reg_ocr_result",
+          "ai_reg_search_page_text",
+          "llm_step_5_chosen_abs",
+          "page_4_text",
+          "page_7_text",
+          "step_10_input_full",
+          "step_10_output_full",
+          "step_1_input_full",
+          "step_1_output_full",
+          "step_2_input_full",
+          "step_2_output_full",
+          "step_3_input_full",
+          "step_3_output_full",
+          "step_4_input_full",
+          "step_4_output_full",
+          "step_5_input_full",
+          "step_5_output_full",
+          "step_6_input_full",
+          "step_6_output_full",
+          "step_7_input_full",
+          "step_7_output_full",
+          "step_8_input_full",
+          "step_8_output_full",
+          "step_9_input_full",
+          "step_9_output_full"
+        ],
+        "final_answer": null
+      }
+    },
+    "step_11_output_full": {
+      "action": "unhandled_step",
+      "step_text": "Enter 2016-08-11 and 2016-08-12 into the date inputs, select \"Submission date (original)\", and submit the search."
+    },
+    "page_12_text": "Advanced Search | arXiv e-print repository Skip to main content We gratefully acknowledge support from the Simons Foundation, member institutions , and all contributors. Donate Help | Advanced Search All fields Title Author Abstract Comments Journal reference ACM classification MSC classification Report number arXiv identifier DOI ORCID arXiv author ID Help pages Full text Search Login Advanced Search Search v0.5.6 released 2020-02-24 Simple Search Whoops! Something went wrong. Please correct errors in the form below. Search term(s) Boolean operator AND OR NOT Search term Field to search Title Author(s) Abstract Comments Journal reference ACM classification MSC classification Report number arXiv identifier Cross-list category DOI ORCID arXiv author ID All fields – Add another term + Search Subject All classifications will be included by default. Computer Science (cs) Economics (econ) Electrical Engineering and Systems Science (eess) Mathematics (math) Physics Subtopic within physics all astro-ph cond-mat gr-qc hep-ex hep-lat hep-ph hep-th math-ph nlin nucl-ex nucl-th physics quant-ph Quantitative Biology (q-bio) Quantitative Finance (q-fin) Statistics (stat) Include cross-listed papers Exclude cross-listed papers Date Not a valid choice All dates Past 12 months Specific year Enter four digit year Date range From to When limiting by date range, the lower bound of the \"from\" date\n                  and the upper bound of the \"to\" date are used. For example,\n                  searching with From: 2012-02 and To: 2013 will search for papers submitted from 2012-02-01 to 2013-12-31 . Submission date (most recent) Submission date (original) Announcement date You may filter on either submission date or announcement date. Note that announcement date supports only year and month granularity. Show abstracts Hide abstracts 25 50 100 200 results per page Include older versions of papers Search Searching by Author Name Using the Author(s) field produces best results for author name searches. For the most precise name search, follow surname(s), forename(s) or surname(s), initial(s) pattern: example Hawking, S or Hawking, Stephen For best results on multiple author names, separate individuals with a ; (semicolon). Example: Jin, D S; Ye, J Author names enclosed in quotes will return only exact matches . For example, \"Stephen Hawking\" will not return matches for Stephen W. Hawking. Diacritic character variants are automatically searched in the Author(s) field. Queries with no punctuation will treat each term independently. Searching by subcategory To search within a subcategory select All fields . A subcategory search can be combined with an author or keyword search by clicking on add another term in advanced search. Tips Wildcards: Use ? to replace a single character or * to replace any number of characters. Can be used in any field, but not in the first character position. See Journal References tips for exceptions. Expressions: TeX expressions can be searched, enclosed in single $ characters. Phrases: Enclose phrases in double quotes for exact matches in title, abstract, and comments. Dates: Sorting by announcement date will use the year and month the original version (v1) of the paper was announced. Sorting by submission date will use the year, month and day the latest version of the paper was submitted. Journal References: If a journal reference search contains a wildcard, matches will be made using wildcard matching as expected. For example, math* will match math , maths , mathematics . If a journal reference search does not contain a wildcard, only exact phrases entered will be matched. For example, math would match math or math and science but not maths or mathematics . All journal reference searches that do not contain a wildcard are literal searches: a search for Physica A will match all papers with journal references containing Physica A , but a search for Physica A, 245 (1997) 181 will only return the paper with journal reference Physica A, 245 (1997) 181 . Search v0.5.6 released 2020-02-24 About Help contact arXiv Click here to contact arXiv Contact subscribe to arXiv mailings Click here to subscribe Subscribe Copyright Privacy Policy Web Accessibility Assistance arXiv Operational Status Get status notifications via email or slack",
+    "step_12_input_full": {
+      "step_no": 12,
+      "step_text": "Search for instances of the six words in the results to find the paper titled \"Phase transition from egalitarian to hierarchical societies driven by competition between cognitive and social constraints\", indicating that \"egalitarian\" is the correct answer.",
+      "state_before": {
+        "step_idx": 11,
+        "known_scratch_keys": [
+          "ai_reg_abs_links",
+          "ai_reg_label_words",
+          "ai_reg_ocr_result",
+          "ai_reg_search_page_text",
+          "llm_step_5_chosen_abs",
+          "page_4_text",
+          "page_7_text",
+          "step_10_input_full",
+          "step_10_output_full",
+          "step_11_input_full",
+          "step_11_output_full",
+          "step_1_input_full",
+          "step_1_output_full",
+          "step_2_input_full",
+          "step_2_output_full",
+          "step_3_input_full",
+          "step_3_output_full",
+          "step_4_input_full",
+          "step_4_output_full",
+          "step_5_input_full",
+          "step_5_output_full",
+          "step_6_input_full",
+          "step_6_output_full",
+          "step_7_input_full",
+          "step_7_output_full",
+          "step_8_input_full",
+          "step_8_output_full",
+          "step_9_input_full",
+          "step_9_output_full"
+        ],
+        "final_answer": null
+      }
+    },
+    "step_12_output_full": {
+      "action": "extract_text",
+      "text_full": "Advanced Search | arXiv e-print repository Skip to main content We gratefully acknowledge support from the Simons Foundation, member institutions , and all contributors. Donate Help | Advanced Search All fields Title Author Abstract Comments Journal reference ACM classification MSC classification Report number arXiv identifier DOI ORCID arXiv author ID Help pages Full text Search Login Advanced Search Search v0.5.6 released 2020-02-24 Simple Search Whoops! Something went wrong. Please correct errors in the form below. Search term(s) Boolean operator AND OR NOT Search term Field to search Title Author(s) Abstract Comments Journal reference ACM classification MSC classification Report number arXiv identifier Cross-list category DOI ORCID arXiv author ID All fields – Add another term + Search Subject All classifications will be included by default. Computer Science (cs) Economics (econ) Electrical Engineering and Systems Science (eess) Mathematics (math) Physics Subtopic within physics all astro-ph cond-mat gr-qc hep-ex hep-lat hep-ph hep-th math-ph nlin nucl-ex nucl-th physics quant-ph Quantitative Biology (q-bio) Quantitative Finance (q-fin) Statistics (stat) Include cross-listed papers Exclude cross-listed papers Date Not a valid choice All dates Past 12 months Specific year Enter four digit year Date range From to When limiting by date range, the lower bound of the \"from\" date\n                  and the upper bound of the \"to\" date are used. For example,\n                  searching with From: 2012-02 and To: 2013 will search for papers submitted from 2012-02-01 to 2013-12-31 . Submission date (most recent) Submission date (original) Announcement date You may filter on either submission date or announcement date. Note that announcement date supports only year and month granularity. Show abstracts Hide abstracts 25 50 100 200 results per page Include older versions of papers Search Searching by Author Name Using the Author(s) field produces best results for author name searches. For the most precise name search, follow surname(s), forename(s) or surname(s), initial(s) pattern: example Hawking, S or Hawking, Stephen For best results on multiple author names, separate individuals with a ; (semicolon). Example: Jin, D S; Ye, J Author names enclosed in quotes will return only exact matches . For example, \"Stephen Hawking\" will not return matches for Stephen W. Hawking. Diacritic character variants are automatically searched in the Author(s) field. Queries with no punctuation will treat each term independently. Searching by subcategory To search within a subcategory select All fields . A subcategory search can be combined with an author or keyword search by clicking on add another term in advanced search. Tips Wildcards: Use ? to replace a single character or * to replace any number of characters. Can be used in any field, but not in the first character position. See Journal References tips for exceptions. Expressions: TeX expressions can be searched, enclosed in single $ characters. Phrases: Enclose phrases in double quotes for exact matches in title, abstract, and comments. Dates: Sorting by announcement date will use the year and month the original version (v1) of the paper was announced. Sorting by submission date will use the year, month and day the latest version of the paper was submitted. Journal References: If a journal reference search contains a wildcard, matches will be made using wildcard matching as expected. For example, math* will match math , maths , mathematics . If a journal reference search does not contain a wildcard, only exact phrases entered will be matched. For example, math would match math or math and science but not maths or mathematics . All journal reference searches that do not contain a wildcard are literal searches: a search for Physica A will match all papers with journal references containing Physica A , but a search for Physica A, 245 (1997) 181 will only return the paper with journal reference Physica A, 245 (1997) 181 . Search v0.5.6 released 2020-02-24 About Help contact arXiv Click here to contact arXiv Contact subscribe to arXiv mailings Click here to subscribe Subscribe Copyright Privacy Policy Web Accessibility Assistance arXiv Operational Status Get status notifications via email or slack",
+      "scratch_key": "page_12_text"
+    }
+  }
+}
