@@ -1,0 +1,154 @@
+GOAL: One orchestrator emits a plan with multiple branches (workers + optional tools). Loop only if evaluator fails.
+SEED: 25  STEPS: 42  REPLAN_LOOPS: 1
+Max Branches: 8  Max Branch Depth: 2
+
+0000 [OK] router                 :: llm_orchestrator       0ms  {'seeded': True}
+0001 [OK] fanout                 :: branch                 0ms  {'branch_id': 'fanout', 'k': 7}
+0002 [OK] __BRANCH__             :: branch_start           0ms  start=fanout:0:code stop_at=join depth=2
+0003 [OK] fanout:0:code          :: code_exec              0ms  {'ok': True, 'locals': {'x': '2'}}
+0004 [OK] fanout:0:w0            :: llm_worker             0ms  {'worker': 'fanout:0:w0', 'scope': 'fanout:0', 'text': '[fanout:0:w0] You are fanout:0:w0. Stance: Practical Goal: One orchestrator emits a plan with multiple branches (workers + optional tools). Loop only if evaluator fails. Context: {"scope": "fanout:0", "br
+0005 [OK] __BRANCH__             :: branch_start           0ms  start=fanout:1:calc stop_at=join depth=2
+0006 [OK] fanout:1:calc          :: calculator             0ms  {'expr': '2*(3+4)', 'result': 14.0}
+0007 [OK] fanout:1:w0            :: llm_worker             0ms  {'worker': 'fanout:1:w0', 'scope': 'fanout:1', 'text': '[fanout:1:w0] You are fanout:1:w0. Stance: Skeptical Goal: One orchestrator emits a plan with multiple branches (workers + optional tools). Loop only if evaluator fails. Context: {"scope": "fanout:1", "br
+0008 [OK] __BRANCH__             :: branch_start           0ms  start=fanout:2:search stop_at=join depth=2
+0009 [OK] fanout:2:search        :: web_search             0ms  {'query': 'One orchestrator emits a plan with multiple branches (workers + optional tools). Loop only if evaluator fails.', 'n_results': 2}
+0010 [OK] fanout:2:code          :: code_exec              0ms  {'ok': True, 'locals': {'x': '2'}}
+0011 [OK] __BRANCH__             :: branch_depth_cap       0ms  Stopped at depth_limit=2 before fanout:2:w0
+0012 [OK] __BRANCH__             :: branch_start           0ms  start=fanout:3:code stop_at=join depth=2
+0013 [OK] fanout:3:code          :: code_exec              0ms  {'ok': True, 'locals': {'x': '2'}}
+0014 [OK] fanout:3:w0            :: llm_worker             0ms  {'worker': 'fanout:3:w0', 'scope': 'fanout:3', 'text': '[fanout:3:w0] You are fanout:3:w0. Stance: Performance Goal: One orchestrator emits a plan with multiple branches (workers + optional tools). Loop only if evaluator fails. Context: {"scope": "fanout:3", "
+0015 [OK] __BRANCH__             :: branch_start           0ms  start=fanout:4:calc stop_at=join depth=2
+0016 [OK] fanout:4:calc          :: calculator             0ms  {'expr': '2*(3+4)', 'result': 14.0}
+0017 [OK] fanout:4:w0            :: llm_worker             0ms  {'worker': 'fanout:4:w0', 'scope': 'fanout:4', 'request': {'type': 'branch', 'k': 3, 'reason': 'fanout:4:w0 wants parallel exploration (simulated).', 'scope': 'fanout:4'}}
+0018 [OK] __BRANCH__             :: branch_start           0ms  start=fanout:5:search stop_at=join depth=2
+0019 [OK] fanout:5:search        :: web_search             0ms  {'query': 'One orchestrator emits a plan with multiple branches (workers + optional tools). Loop only if evaluator fails.', 'n_results': 2}
+0020 [OK] fanout:5:w0            :: llm_worker             0ms  {'worker': 'fanout:5:w0', 'scope': 'fanout:5', 'text': '[fanout:5:w0] You are fanout:5:w0. Stance: Practical Goal: One orchestrator emits a plan with multiple branches (workers + optional tools). Loop only if evaluator fails. Context: {"scope": "fanout:5", "br
+0021 [OK] __BRANCH__             :: branch_start           0ms  start=fanout:6:w0 stop_at=join depth=2
+0022 [OK] fanout:6:w0            :: llm_worker             0ms  {'worker': 'fanout:6:w0', 'scope': 'fanout:6', 'text': '[fanout:6:w0] You are fanout:6:w0. Stance: Skeptical Goal: One orchestrator emits a plan with multiple branches (workers + optional tools). Loop only if evaluator fails. Context: {"scope": "fanout:6", "br
+0023 [OK] join                   :: join                   0ms  {'join_id': 'join', 'n_parts': 6}
+0024 [OK] writer                 :: writer                 0ms  {'draft_len': 762}
+0025 [OK] evaluator              :: evaluate               0ms  {'satisfied': True, 'missing': []}
+0026 [OK] __RUNNER__             :: replan_queued          0ms  Worker fanout:4:w0 requested branching
+0027 [OK] router                 :: llm_orchestrator       0ms  {'seeded': True}
+0028 [OK] fanout                 :: branch                 0ms  {'branch_id': 'fanout', 'k': 3}
+0029 [OK] __BRANCH__             :: branch_start           0ms  start=fanout:0:calc stop_at=join depth=2
+0030 [OK] fanout:0:calc          :: calculator             0ms  {'expr': '2*(3+4)', 'result': 14.0}
+0031 [OK] fanout:0:code          :: code_exec              0ms  {'ok': True, 'locals': {'x': '2'}}
+0032 [OK] __BRANCH__             :: branch_depth_cap       0ms  Stopped at depth_limit=2 before fanout:0:w0
+0033 [OK] __BRANCH__             :: branch_start           0ms  start=fanout:1:search stop_at=join depth=2
+0034 [OK] fanout:1:search        :: web_search             0ms  {'query': 'One orchestrator emits a plan with multiple branches (workers + optional tools). Loop only if evaluator fails.', 'n_results': 2}
+0035 [OK] fanout:1:w0            :: llm_worker             0ms  {'worker': 'fanout:1:w0', 'scope': 'fanout:1', 'text': '[fanout:1:w0] You are fanout:1:w0. Stance: Creative Goal: One orchestrator emits a plan with multiple branches (workers + optional tools). Loop only if evaluator fails. Context: {"scope": "fanout:1", "bra
+0036 [OK] __BRANCH__             :: branch_start           0ms  start=fanout:2:w0 stop_at=join depth=2
+0037 [OK] fanout:2:w0            :: llm_worker             0ms  {'worker': 'fanout:2:w0', 'scope': 'fanout:2', 'text': '[fanout:2:w0] You are fanout:2:w0. Stance: Performance Goal: One orchestrator emits a plan with multiple branches (workers + optional tools). Loop only if evaluator fails. Context: {"scope": "fanout:2", "
+0038 [OK] fanout:2:w1            :: llm_worker             0ms  {'worker': 'fanout:2:w1', 'scope': 'fanout:2', 'text': '[fanout:2:w1] You are fanout:2:w1. Stance: Systems Goal: One orchestrator emits a plan with multiple branches (workers + optional tools). Loop only if evaluator fails. Context: {"scope": "fanout:2", "bran
+0039 [OK] join                   :: join                   0ms  {'join_id': 'join', 'n_parts': 8}
+0040 [OK] writer                 :: writer                 0ms  {'draft_len': 762}
+0041 [OK] evaluator              :: evaluate               0ms  {'satisfied': True, 'missing': []}
+
+BRANCH_REQUESTS:
+[
+  {
+    "type": "branch",
+    "k": 3,
+    "reason": "fanout:4:w0 wants parallel exploration (simulated).",
+    "scope": "fanout:4"
+  }
+]
+
+FINAL_DRAFT:
+[writer] You are the final writer. Goal: One orchestrator emits a plan with multiple branches (workers + optional tools). Loop only if evaluator fails. Aggregated branch notes: [fanout:0::fanout:0:w0] [fanout:0:w0] You are fanout:0:w0. Stance: Practical Goal: One orchestrator emits a plan with multiple branches (workers + optional tools). Loop only if evaluator fails. Context: {"scope": "fanout:0", "branch_ctx": {"code_output": {"ok": true, "locals": {"x": "2"}}}, "replan_loops": 0, "seed": 25, "latest_branch_request": null} If you believe branching is necessary, output JSON: {"request":{"type":"branch","k":<int>,"reason":"..."}} Otherwise write your contribution....  [fanout:1::fanout:1:w0] [fanout:1:w0] You are fanout:1:w0. Stance: Creative Goal: ...
+
+FLOW_VISUALIZATION (per plan, execution-derived)
+Legend: A -> B means B executed immediately after A within the same context.
+
+--- PLAN 0 (trace idx 0..26) ---
+Execution order:
+  router
+  fanout
+    [BRANCH START] fanout:0:code  (stop_at=join)
+      fanout:0:code
+      fanout:0:w0
+    [BRANCH START] fanout:1:calc  (stop_at=join)
+      fanout:1:calc
+      fanout:1:w0
+    [BRANCH START] fanout:2:search  (stop_at=join)
+      fanout:2:search
+      fanout:2:code
+      [BRANCH DEPTH CAP] Stopped at depth_limit=2 before fanout:2:w0
+    [BRANCH START] fanout:3:code  (stop_at=join)
+      fanout:3:code
+      fanout:3:w0
+    [BRANCH START] fanout:4:calc  (stop_at=join)
+      fanout:4:calc
+      fanout:4:w0
+    [BRANCH START] fanout:5:search  (stop_at=join)
+      fanout:5:search
+      fanout:5:w0
+    [BRANCH START] fanout:6:w0  (stop_at=join)
+      fanout:6:w0
+      join
+  writer
+  evaluator
+  __RUNNER__
+
+Inferred edges (execution-adjacent):
+  router -> fanout
+  fanout:0:code -> fanout:0:w0
+  fanout:1:calc -> fanout:1:w0
+  fanout:2:search -> fanout:2:code
+  fanout:3:code -> fanout:3:w0
+  fanout:4:calc -> fanout:4:w0
+  fanout:5:search -> fanout:5:w0
+  fanout:6:w0 -> join
+  fanout -> writer
+  writer -> evaluator
+  evaluator -> __RUNNER__
+
+Connectivity (adjacency list):
+  evaluator: __RUNNER__
+  fanout: writer
+  fanout:0:code: fanout:0:w0
+  fanout:1:calc: fanout:1:w0
+  fanout:2:search: fanout:2:code
+  fanout:3:code: fanout:3:w0
+  fanout:4:calc: fanout:4:w0
+  fanout:5:search: fanout:5:w0
+  fanout:6:w0: join
+  router: fanout
+  writer: evaluator
+
+--- PLAN 1 (trace idx 27..41) ---
+Execution order:
+  router
+  fanout
+    [BRANCH START] fanout:0:calc  (stop_at=join)
+      fanout:0:calc
+      fanout:0:code
+      [BRANCH DEPTH CAP] Stopped at depth_limit=2 before fanout:0:w0
+    [BRANCH START] fanout:1:search  (stop_at=join)
+      fanout:1:search
+      fanout:1:w0
+    [BRANCH START] fanout:2:w0  (stop_at=join)
+      fanout:2:w0
+      fanout:2:w1
+      join
+  writer
+  evaluator
+
+Inferred edges (execution-adjacent):
+  router -> fanout
+  fanout:0:calc -> fanout:0:code
+  fanout:1:search -> fanout:1:w0
+  fanout:2:w0 -> fanout:2:w1
+  fanout:2:w1 -> join
+  fanout -> writer
+  writer -> evaluator
+
+Connectivity (adjacency list):
+  fanout: writer
+  fanout:0:calc: fanout:0:code
+  fanout:1:search: fanout:1:w0
+  fanout:2:w0: fanout:2:w1
+  fanout:2:w1: join
+  router: fanout
+  writer: evaluator

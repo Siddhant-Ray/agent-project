@@ -1,0 +1,50 @@
+GOAL: One orchestrator emits a plan with multiple branches (workers + optional tools). Loop only if evaluator fails.
+SEED: 22  STEPS: 10  REPLAN_LOOPS: 0
+Max Branches: 4  Max Branch Depth: 3
+
+0000 [OK] router                 :: llm_orchestrator       0ms  {'seeded': True}
+0001 [OK] fanout                 :: branch                 0ms  {'branch_id': 'fanout', 'k': 2}
+0002 [OK] __BRANCH__             :: branch_start           0ms  start=fanout:0:search stop_at=join depth=3
+0003 [OK] fanout:0:search        :: web_search             0ms  {'query': 'One orchestrator emits a plan with multiple branches (workers + optional tools). Loop only if evaluator fails.', 'n_results': 2}
+0004 [OK] fanout:0:w0            :: llm_worker             0ms  {'worker': 'fanout:0:w0', 'scope': 'fanout:0', 'text': '[fanout:0:w0] You are fanout:0:w0. Stance: Creative Goal: One orchestrator emits a plan with multiple branches (workers + optional tools). Loop only if evaluator fails. Context: {"scope": "fanout:0", "bra
+0005 [OK] __BRANCH__             :: branch_start           0ms  start=fanout:1:w0 stop_at=join depth=3
+0006 [OK] fanout:1:w0            :: llm_worker             0ms  {'worker': 'fanout:1:w0', 'scope': 'fanout:1', 'text': '[fanout:1:w0] You are fanout:1:w0. Stance: Performance Goal: One orchestrator emits a plan with multiple branches (workers + optional tools). Loop only if evaluator fails. Context: {"scope": "fanout:1", "
+0007 [OK] join                   :: join                   0ms  {'join_id': 'join', 'n_parts': 2}
+0008 [OK] writer                 :: writer                 0ms  {'draft_len': 762}
+0009 [OK] evaluator              :: evaluate               0ms  {'satisfied': True, 'missing': []}
+
+BRANCH_REQUESTS:
+[]
+
+FINAL_DRAFT:
+[writer] You are the final writer. Goal: One orchestrator emits a plan with multiple branches (workers + optional tools). Loop only if evaluator fails. Aggregated branch notes: [fanout:0::fanout:0:w0] [fanout:0:w0] You are fanout:0:w0. Stance: Creative Goal: One orchestrator emits a plan with multiple branches (workers + optional tools). Loop only if evaluator fails. Context: {"scope": "fanout:0", "branch_ctx": {"search_results": [{"title": "Example result 1", "url": "https://example.com/1", "snippet": "Top snippet for: One orchestrator emits a plan with multiple branches (workers + optional tools). Loop only if evaluator fails."}, {"title": "Example result 2", "url": "https://example.com/2", "snippet": "More about: One orchestrator emits a plan wit...
+
+FLOW_VISUALIZATION (per plan, execution-derived)
+Legend: A -> B means B executed immediately after A within the same context.
+
+--- PLAN 0 (trace idx 0..9) ---
+Execution order:
+  router
+  fanout
+    [BRANCH START] fanout:0:search  (stop_at=join)
+      fanout:0:search
+      fanout:0:w0
+    [BRANCH START] fanout:1:w0  (stop_at=join)
+      fanout:1:w0
+      join
+  writer
+  evaluator
+
+Inferred edges (execution-adjacent):
+  router -> fanout
+  fanout:0:search -> fanout:0:w0
+  fanout:1:w0 -> join
+  fanout -> writer
+  writer -> evaluator
+
+Connectivity (adjacency list):
+  fanout: writer
+  fanout:0:search: fanout:0:w0
+  fanout:1:w0: join
+  router: fanout
+  writer: evaluator
