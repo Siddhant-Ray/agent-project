@@ -2,3 +2,4 @@ venv*
 replay/checkpoints*
 replay/downloads
 __pycache__/
+*.pdf 
