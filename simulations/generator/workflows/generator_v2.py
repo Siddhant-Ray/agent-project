@@ -1,7 +1,6 @@
 """
 dynamic_multi_agent_orchestrator.py
 
-Option A (worker requests branching) + Fix 1:
 - Workers may REQUEST branching (structured JSON).
 - Runner DOES NOT interrupt immediately.
 - Runner finishes the current plan (so you always get join/writer/evaluator).
