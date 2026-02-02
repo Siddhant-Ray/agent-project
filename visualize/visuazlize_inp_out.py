@@ -343,7 +343,7 @@ if __name__ == "__main__":
     steps = [
         (
             "You are a helpful agent who needs to perform a task. What tasks can you perform?",
-            "I can do math."
+            "I can do math. I can do coding."
         ),
         (
             "Previous agent said I can do math and coding. Can you do coding?",
@@ -354,7 +354,7 @@ if __name__ == "__main__":
             "I can do math."
         ),
         (
-            "So far we have I can do math and I can do coding. Can you repeat your capabilities?",
+            "So far we have I can do math. I can do things. I can do coding. Can you repeat your capabilities?",
             "I can do math and coding and other things which you did not ask."
         ),
         (
@@ -362,15 +362,15 @@ if __name__ == "__main__":
             "I can do coding."
         ),
         (
-            "We saw earlier that I can do math. Can you confirm math again?",
+            "We saw earlier that I can do math. Can you confirm math again? I can do other things. I can do coding.",
             "I can do math and other things."
         ),
         (
-            "Multiple outputs included I can do math and coding. Please focus on coding tasks now.",
+            "So far we have I can do coding. I can do things. I can do math. Please focus on coding tasks now.",
             "I can do coding and other things."
         ),
         (
-            "Prior outputs said I can do coding and I can do math. Can you restate both?",
+            "Prior outputs said I can do coding. I can do math. Can you restate both?",
             "I can do math and coding."
         ),
         (
