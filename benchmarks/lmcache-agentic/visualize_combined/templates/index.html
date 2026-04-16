@@ -82,7 +82,7 @@
     <div class="topbar">
       <div>
         <h1>Trace Visualizer</h1>
-        <p class="subtitle" id="subtitle">Switch between cost growth and KV cache growth for model - <strong>{{ default_model }}</strong>.</p>
+        <p class="subtitle" id="subtitle">Switch between cost growth, KV cache growth, and overall cost for model - <strong>{{ default_model }}</strong>.</p>
       </div>
     </div>
 
@@ -93,12 +93,18 @@
           <select id="metricSelect">
             <option value="cost">Cost</option>
             <option value="kv">KV Cache size</option>
+            <option value="overall">Overall cost</option>
           </select>
         </div>
 
         <div>
           <label for="modelSelect">Model (Used for KV cache size)</label>
           <select id="modelSelect"></select>
+        </div>
+
+        <div>
+          <label for="gpuSelect">GPU (Used for overall cost)</label>
+          <select id="gpuSelect"></select>
         </div>
 
         <div>
@@ -139,6 +145,10 @@
             <div class="v" id="modelName">{{ default_model }}</div>
           </div>
           <div class="stat">
+            <div class="k">GPU</div>
+            <div class="v" id="gpuName">—</div>
+          </div>
+          <div class="stat">
             <div class="k">KV bytes per token</div>
             <div class="v" id="bytesPerToken">—</div>
           </div>
@@ -162,8 +172,11 @@
       sessionIds: [],
       metric: 'cost',
       models: [],
+      gpus: [],
       modelInfo: null,
+      gpuInfo: null,
       modelName: '{{ default_model }}',
+      gpuName: '',
       prefixData: null,
       compactionRatios: [],
       compactionData: new Map(),
@@ -173,6 +186,7 @@
       subtitle: document.getElementById('subtitle'),
       metricSelect: document.getElementById('metricSelect'),
       modelSelect: document.getElementById('modelSelect'),
+      gpuSelect: document.getElementById('gpuSelect'),
       traceSelect: document.getElementById('traceSelect'),
       ratioInput: document.getElementById('ratioInput'),
       addRatioBtn: document.getElementById('addRatioBtn'),
@@ -184,6 +198,7 @@
       traceName: document.getElementById('traceName'),
       turnCount: document.getElementById('turnCount'),
       modelName: document.getElementById('modelName'),
+      gpuName: document.getElementById('gpuName'),
       bytesPerToken: document.getElementById('bytesPerToken'),
       legendNote: document.getElementById('legendNote'),
       errorBox: document.getElementById('errorBox'),
@@ -218,16 +233,25 @@
     }
 
     function isCostMode() { return state.metric === 'cost'; }
-    function prefixEndpoint() { return isCostMode() ? '/api/prefix_cache' : `/api/kv_prefix?model=${encodeURIComponent(state.modelName)}`; }
-    function compactionEndpoint(ratio) {
-      return isCostMode()
-        ? `/api/compaction?ratio=${encodeURIComponent(ratio)}`
-        : `/api/kv_compaction?ratio=${encodeURIComponent(ratio)}&model=${encodeURIComponent(state.modelName)}`;
+    function isKvMode() { return state.metric === 'kv'; }
+    function isOverallMode() { return state.metric === 'overall'; }
+    function prefixEndpoint() {
+      if (isCostMode()) return '/api/prefix_cache';
+      if (isKvMode()) return `/api/kv_prefix?model=${encodeURIComponent(state.modelName)}`;
+      return `/api/overall_prefix?model=${encodeURIComponent(state.modelName)}&gpu=${encodeURIComponent(state.gpuName)}`;
     }
-    function yValueKey() { return isCostMode() ? 'cumulative_cost' : 'kv_bytes'; }
-    function lineLabelBase() { return isCostMode() ? 'Prefix cache' : 'Prefix KV'; }
-    function formatPrimaryValue(x) { return isCostMode() ? `$${Number(x).toFixed(4)}` : formatBytes(x); }
-    function primaryTotal(data) { return isCostMode() ? data.total_input_cost : data.max_kv_bytes; }
+    function compactionEndpoint(ratio) {
+      if (isCostMode()) return `/api/compaction?ratio=${encodeURIComponent(ratio)}`;
+      if (isKvMode()) return `/api/kv_compaction?ratio=${encodeURIComponent(ratio)}&model=${encodeURIComponent(state.modelName)}`;
+      return `/api/overall_compaction?ratio=${encodeURIComponent(ratio)}&model=${encodeURIComponent(state.modelName)}&gpu=${encodeURIComponent(state.gpuName)}`;
+    }
+    function yValueKey() { return isKvMode() ? 'kv_bytes' : 'cumulative_cost'; }
+    function lineLabelBase() { return isKvMode() ? 'Prefix KV' : 'Prefix cache'; }
+    function formatPrimaryValue(x) { return isKvMode() ? formatBytes(x) : `$${Number(x).toFixed(4)}`; }
+    function primaryTotal(data) {
+      if (isKvMode()) return data.max_kv_bytes;
+      return data.total_overall_cost ?? data.total_input_cost;
+    }
     function formatBytes(value) {
       const units = ['B', 'KiB', 'MiB', 'GiB', 'TiB'];
       let v = Number(value);
@@ -241,13 +265,20 @@
       return `${v.toFixed(2)} ${units[i]}`;
     }
     function tooltipFormatter(value) {
-      return isCostMode() ? `$${Number(value).toFixed(4)}` : formatBytes(value);
+      return isKvMode() ? formatBytes(value) : `$${Number(value).toFixed(4)}`;
     }
-    function yAxisTitle() { return isCostMode() ? 'Cost (USD)' : 'KV cache size'; }
+    function yAxisTitle() {
+      if (isKvMode()) return 'KV cache size';
+      return isOverallMode() ? 'Overall cost (USD)' : 'Cost (USD)';
+    }
     function legendText() {
-      return isCostMode()
-        ? 'Y axis shows cumulative input cost in USD using GPT-5.4 input pricing only. Each request uses short-context rates at or below 272K input tokens and long-context rates above 272K input tokens. X axis shows turn number, where turn 0 is the initial uncached prefix.'
-        : 'Y axis shows KV cache size in bytes for the selected model and trace, auto-formatted as MiB or GiB. X axis shows turn number, where turn 0 is the initial uncached prefix.';
+      if (isCostMode()) {
+        return 'Y axis shows cumulative input cost in USD using GPT-5.4 input pricing only. Each request uses short-context rates at or below 272K input tokens and long-context rates above 272K input tokens. X axis shows turn number, where turn 0 is the initial uncached prefix.';
+      }
+      if (isKvMode()) {
+        return 'Y axis shows KV cache size in bytes for the selected model and trace, auto-formatted as MiB or GiB. X axis shows turn number, where turn 0 is the initial uncached prefix.';
+      }
+      return 'Y axis shows cumulative overall cost in USD for the selected GPU preset. Prefix-cache lines pay round-0 recompute, then 10s of KV-storage cost for the full prefix plus recompute cost for new tokens. Compaction lines pay round-0 recompute, then recompute cost for the compacted prefix plus new tokens.';
     }
 
     function buildDatasets() {
@@ -316,7 +347,7 @@
                 title: { display: true, text: yAxisTitle(), color: '#b8c0e0' },
                 ticks: {
                   color: '#eef2ff',
-                  callback(value) { return isCostMode() ? `$${Number(value).toFixed(3)}` : formatBytes(value); }
+                  callback(value) { return isKvMode() ? formatBytes(value) : `$${Number(value).toFixed(3)}`; }
                 },
                 grid: { color: 'rgba(255,255,255,0.08)' }
               }
@@ -333,16 +364,17 @@
 
     function updateStats() {
       els.traceName.textContent = els.traceSelect.value || '—';
-      els.primaryStatLabel.textContent = isCostMode() ? 'Prefix-cache total' : 'Prefix KV peak';
+      els.primaryStatLabel.textContent = isKvMode() ? 'Prefix KV peak' : (isOverallMode() ? 'Prefix-cache total overall cost' : 'Prefix-cache total');
       els.primaryStatValue.textContent = state.prefixData ? formatPrimaryValue(primaryTotal(state.prefixData)) : '—';
       els.turnCount.textContent = state.prefixData ? String(state.prefixData.points.length) : '—';
       els.modelName.textContent = state.modelName || '—';
+      els.gpuName.textContent = state.gpuName || '—';
       if (state.modelInfo) {
         els.bytesPerToken.textContent = `${formatBytes(state.modelInfo.bytes_per_token)} / token`;
       } else {
         els.bytesPerToken.textContent = '—';
       }
-      els.subtitle.innerHTML = `Switch between cost growth and KV cache growth for model - <strong>${state.modelName}</strong>.`;
+      els.subtitle.innerHTML = `Switch between cost growth, KV cache growth, and overall cost for model - <strong>${state.modelName}</strong>.`;
     }
 
     function renderRatioPills() {
@@ -385,6 +417,26 @@
       updateStats();
     }
 
+    async function loadGpus() {
+      const data = await fetchJson('/api/gpus');
+      state.gpus = data.gpus || [];
+      state.gpuName = data.default_gpu || state.gpuName;
+      els.gpuSelect.innerHTML = '';
+      for (const g of state.gpus) {
+        const opt = document.createElement('option');
+        opt.value = g.name;
+        opt.textContent = g.display_name;
+        els.gpuSelect.appendChild(opt);
+      }
+      els.gpuSelect.value = state.gpuName;
+      await loadGpuInfo();
+    }
+
+    async function loadGpuInfo() {
+      state.gpuInfo = await fetchJson(`/api/gpu_info?gpu=${encodeURIComponent(state.gpuName)}`);
+      updateStats();
+    }
+
     async function loadSessionIds() {
       const data = await fetchJson('/api/session_ids');
       state.sessionIds = data.session_ids || [];
@@ -418,6 +470,7 @@
         showError('');
         state.compactionData.clear();
         await loadModelInfo();
+        await loadGpuInfo();
         await loadPrefix();
         for (const key of state.compactionRatios) {
           await loadCompactionRatio(key);
@@ -455,6 +508,7 @@
     async function init() {
       try {
         await loadModels();
+        await loadGpus();
         await loadSessionIds();
         if (state.sessionIds.length > 0) {
           els.traceSelect.value = state.sessionIds[0];
@@ -471,6 +525,11 @@
     });
     els.modelSelect.addEventListener('change', async () => {
       state.modelName = els.modelSelect.value;
+      state.compactionData.clear();
+      await reloadAll();
+    });
+    els.gpuSelect.addEventListener('change', async () => {
+      state.gpuName = els.gpuSelect.value;
       state.compactionData.clear();
       await reloadAll();
     });

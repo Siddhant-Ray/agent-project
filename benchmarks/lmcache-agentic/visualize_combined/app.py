@@ -7,6 +7,8 @@ from compaction_cost import compute_compaction_curve
 from kv_compaction_growth import compute_kv_compaction_curve
 from kv_prefix_growth import compute_kv_prefix_curve
 from model_catalog import DEFAULT_MODEL, get_model_info, model_options
+from gpu_catalog import DEFAULT_GPU, get_gpu_info, gpu_options
+from overall_cost import compute_overall_compaction_curve, compute_overall_prefix_curve
 from prefix_cache_cost import compute_prefix_cache_curve
 
 
@@ -14,6 +16,7 @@ def create_app(csv_path: str) -> Flask:
     app = Flask(__name__)
     app.config['CSV_PATH'] = str(Path(csv_path).resolve())
     app.config['DEFAULT_MODEL'] = DEFAULT_MODEL
+    app.config['DEFAULT_GPU'] = DEFAULT_GPU
 
     @app.get('/')
     def index():
@@ -37,6 +40,20 @@ def create_app(csv_path: str) -> Flask:
     @app.get('/api/models')
     def models():
         return jsonify({'default_model': app.config['DEFAULT_MODEL'], 'models': model_options()})
+
+
+    @app.get('/api/gpus')
+    def gpus():
+        return jsonify({'default_gpu': app.config['DEFAULT_GPU'], 'gpus': gpu_options()})
+
+    @app.get('/api/gpu_info')
+    def gpu_info():
+        gpu_name = request.args.get('gpu', app.config['DEFAULT_GPU']).strip() or app.config['DEFAULT_GPU']
+        try:
+            info = get_gpu_info(gpu_name)
+            return jsonify(info)
+        except Exception as exc:
+            return jsonify({'error': str(exc)}), 400
 
     @app.get('/api/model_info')
     def model_info():
@@ -83,6 +100,39 @@ def create_app(csv_path: str) -> Flask:
             return jsonify({'error': 'Missing session_id'}), 400
         try:
             result = compute_kv_prefix_curve(app.config['CSV_PATH'], session_id, model_name)
+            return jsonify(result)
+        except Exception as exc:
+            return jsonify({'error': str(exc)}), 400
+
+
+    @app.get('/api/overall_prefix')
+    def overall_prefix():
+        session_id = request.args.get('session_id', '').strip()
+        model_name = request.args.get('model', app.config['DEFAULT_MODEL']).strip() or app.config['DEFAULT_MODEL']
+        gpu_name = request.args.get('gpu', app.config['DEFAULT_GPU']).strip() or app.config['DEFAULT_GPU']
+        if not session_id:
+            return jsonify({'error': 'Missing session_id'}), 400
+        try:
+            result = compute_overall_prefix_curve(app.config['CSV_PATH'], session_id, model_name, gpu_name)
+            return jsonify(result)
+        except Exception as exc:
+            return jsonify({'error': str(exc)}), 400
+
+    @app.get('/api/overall_compaction')
+    def overall_compaction():
+        session_id = request.args.get('session_id', '').strip()
+        model_name = request.args.get('model', app.config['DEFAULT_MODEL']).strip() or app.config['DEFAULT_MODEL']
+        gpu_name = request.args.get('gpu', app.config['DEFAULT_GPU']).strip() or app.config['DEFAULT_GPU']
+        ratio_text = request.args.get('ratio', '').strip()
+        if not session_id:
+            return jsonify({'error': 'Missing session_id'}), 400
+        if ratio_text == '':
+            return jsonify({'error': 'Missing ratio'}), 400
+        try:
+            ratio = float(ratio_text)
+            if ratio > 1.0:
+                ratio /= 100.0
+            result = compute_overall_compaction_curve(app.config['CSV_PATH'], session_id, ratio, model_name, gpu_name)
             return jsonify(result)
         except Exception as exc:
             return jsonify({'error': str(exc)}), 400
