@@ -9,6 +9,12 @@ from kv_prefix_growth import compute_kv_prefix_curve
 from model_catalog import DEFAULT_MODEL, get_model_info, model_options
 from gpu_catalog import DEFAULT_GPU, get_gpu_info, gpu_options
 from overall_cost import compute_overall_compaction_curve, compute_overall_prefix_curve
+from cost_quality import (
+    compute_cost_quality_compaction_curve,
+    compute_cost_quality_prefix_curve,
+    compute_avg_quality_compaction_point,
+    compute_avg_quality_prefix_point,
+)
 from prefix_cache_cost import compute_prefix_cache_curve
 
 
@@ -133,6 +139,72 @@ def create_app(csv_path: str) -> Flask:
             if ratio > 1.0:
                 ratio /= 100.0
             result = compute_overall_compaction_curve(app.config['CSV_PATH'], session_id, ratio, model_name, gpu_name)
+            return jsonify(result)
+        except Exception as exc:
+            return jsonify({'error': str(exc)}), 400
+
+
+    @app.get('/api/cost_quality_prefix')
+    def cost_quality_prefix():
+        session_id = request.args.get('session_id', '').strip()
+        model_name = request.args.get('model', app.config['DEFAULT_MODEL']).strip() or app.config['DEFAULT_MODEL']
+        gpu_name = request.args.get('gpu', app.config['DEFAULT_GPU']).strip() or app.config['DEFAULT_GPU']
+        if not session_id:
+            return jsonify({'error': 'Missing session_id'}), 400
+        try:
+            result = compute_cost_quality_prefix_curve(app.config['CSV_PATH'], session_id, model_name, gpu_name)
+            return jsonify(result)
+        except Exception as exc:
+            return jsonify({'error': str(exc)}), 400
+
+    @app.get('/api/cost_quality_compaction')
+    def cost_quality_compaction():
+        session_id = request.args.get('session_id', '').strip()
+        model_name = request.args.get('model', app.config['DEFAULT_MODEL']).strip() or app.config['DEFAULT_MODEL']
+        gpu_name = request.args.get('gpu', app.config['DEFAULT_GPU']).strip() or app.config['DEFAULT_GPU']
+        ratio_text = request.args.get('ratio', '').strip()
+        if not session_id:
+            return jsonify({'error': 'Missing session_id'}), 400
+        if ratio_text == '':
+            return jsonify({'error': 'Missing ratio'}), 400
+        try:
+            ratio = float(ratio_text)
+            if ratio > 1.0:
+                ratio /= 100.0
+            result = compute_cost_quality_compaction_curve(app.config['CSV_PATH'], session_id, ratio, model_name, gpu_name)
+            return jsonify(result)
+        except Exception as exc:
+            return jsonify({'error': str(exc)}), 400
+
+
+    @app.get('/api/avg_quality_prefix')
+    def avg_quality_prefix():
+        session_id = request.args.get('session_id', '').strip()
+        model_name = request.args.get('model', app.config['DEFAULT_MODEL']).strip() or app.config['DEFAULT_MODEL']
+        gpu_name = request.args.get('gpu', app.config['DEFAULT_GPU']).strip() or app.config['DEFAULT_GPU']
+        if not session_id:
+            return jsonify({'error': 'Missing session_id'}), 400
+        try:
+            result = compute_avg_quality_prefix_point(app.config['CSV_PATH'], session_id, model_name, gpu_name)
+            return jsonify(result)
+        except Exception as exc:
+            return jsonify({'error': str(exc)}), 400
+
+    @app.get('/api/avg_quality_compaction')
+    def avg_quality_compaction():
+        session_id = request.args.get('session_id', '').strip()
+        model_name = request.args.get('model', app.config['DEFAULT_MODEL']).strip() or app.config['DEFAULT_MODEL']
+        gpu_name = request.args.get('gpu', app.config['DEFAULT_GPU']).strip() or app.config['DEFAULT_GPU']
+        ratio_text = request.args.get('ratio', '').strip()
+        if not session_id:
+            return jsonify({'error': 'Missing session_id'}), 400
+        if ratio_text == '':
+            return jsonify({'error': 'Missing ratio'}), 400
+        try:
+            ratio = float(ratio_text)
+            if ratio > 1.0:
+                ratio /= 100.0
+            result = compute_avg_quality_compaction_point(app.config['CSV_PATH'], session_id, ratio, model_name, gpu_name)
             return jsonify(result)
         except Exception as exc:
             return jsonify({'error': str(exc)}), 400

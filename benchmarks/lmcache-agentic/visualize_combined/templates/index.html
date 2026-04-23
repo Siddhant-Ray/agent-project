@@ -82,7 +82,7 @@
     <div class="topbar">
       <div>
         <h1>Trace Visualizer</h1>
-        <p class="subtitle" id="subtitle">Switch between cost growth, KV cache growth, and overall cost for model - <strong>{{ default_model }}</strong>.</p>
+        <p class="subtitle" id="subtitle">Switch between cost growth, KV cache growth, overall cost, Cost-Vs-Quality, and Avg-Quality-Vs-Total-Cost for model - <strong>{{ default_model }}</strong>.</p>
       </div>
     </div>
 
@@ -94,6 +94,8 @@
             <option value="cost">Cost</option>
             <option value="kv">KV Cache size</option>
             <option value="overall">Overall cost</option>
+            <option value="cost_quality">Cost-Vs-Quality</option>
+            <option value="avg_quality_total_cost">Avg-Quality-Vs-Total-Cost</option>
           </select>
         </div>
 
@@ -235,17 +237,23 @@
     function isCostMode() { return state.metric === 'cost'; }
     function isKvMode() { return state.metric === 'kv'; }
     function isOverallMode() { return state.metric === 'overall'; }
+    function isCostQualityMode() { return state.metric === 'cost_quality'; }
+    function isAvgQualityMode() { return state.metric === 'avg_quality_total_cost'; }
     function prefixEndpoint() {
       if (isCostMode()) return '/api/prefix_cache';
       if (isKvMode()) return `/api/kv_prefix?model=${encodeURIComponent(state.modelName)}`;
+      if (isCostQualityMode()) return `/api/cost_quality_prefix?model=${encodeURIComponent(state.modelName)}&gpu=${encodeURIComponent(state.gpuName)}`;
+      if (isAvgQualityMode()) return `/api/avg_quality_prefix?model=${encodeURIComponent(state.modelName)}&gpu=${encodeURIComponent(state.gpuName)}`;
       return `/api/overall_prefix?model=${encodeURIComponent(state.modelName)}&gpu=${encodeURIComponent(state.gpuName)}`;
     }
     function compactionEndpoint(ratio) {
       if (isCostMode()) return `/api/compaction?ratio=${encodeURIComponent(ratio)}`;
       if (isKvMode()) return `/api/kv_compaction?ratio=${encodeURIComponent(ratio)}&model=${encodeURIComponent(state.modelName)}`;
+      if (isCostQualityMode()) return `/api/cost_quality_compaction?ratio=${encodeURIComponent(ratio)}&model=${encodeURIComponent(state.modelName)}&gpu=${encodeURIComponent(state.gpuName)}`;
+      if (isAvgQualityMode()) return `/api/avg_quality_compaction?ratio=${encodeURIComponent(ratio)}&model=${encodeURIComponent(state.modelName)}&gpu=${encodeURIComponent(state.gpuName)}`;
       return `/api/overall_compaction?ratio=${encodeURIComponent(ratio)}&model=${encodeURIComponent(state.modelName)}&gpu=${encodeURIComponent(state.gpuName)}`;
     }
-    function yValueKey() { return isKvMode() ? 'kv_bytes' : 'cumulative_cost'; }
+    function yValueKey() { if (isKvMode()) return 'kv_bytes'; if (isAvgQualityMode()) return 'avg_f1_score'; return 'cumulative_cost'; }
     function lineLabelBase() { return isKvMode() ? 'Prefix KV' : 'Prefix cache'; }
     function formatPrimaryValue(x) { return isKvMode() ? formatBytes(x) : `$${Number(x).toFixed(4)}`; }
     function primaryTotal(data) {
@@ -265,10 +273,15 @@
       return `${v.toFixed(2)} ${units[i]}`;
     }
     function tooltipFormatter(value) {
-      return isKvMode() ? formatBytes(value) : `$${Number(value).toFixed(4)}`;
+      return isKvMode() ? formatBytes(value) : `${Number(value).toFixed(4)}`;
+    }
+    function xAxisTitle() {
+      return (isCostQualityMode() || isAvgQualityMode()) ? 'Overall cost' : 'Turn';
     }
     function yAxisTitle() {
       if (isKvMode()) return 'KV cache size';
+      if (isCostQualityMode()) return 'F1-score';
+      if (isAvgQualityMode()) return 'Average F1-score';
       return isOverallMode() ? 'Overall cost (USD)' : 'Cost (USD)';
     }
     function legendText() {
@@ -278,15 +291,24 @@
       if (isKvMode()) {
         return 'Y axis shows KV cache size in bytes for the selected model and trace, auto-formatted as MiB or GiB. X axis shows turn number, where turn 0 is the initial uncached prefix.';
       }
-      return 'Y axis shows cumulative overall cost in USD for the selected GPU preset. Prefix-cache lines pay round-0 recompute, then 10s of KV-storage cost for the full prefix plus recompute cost for new tokens. Compaction lines pay round-0 recompute, then recompute cost for the compacted prefix plus new tokens.';
+      if (isOverallMode()) {
+        return 'Y axis shows cumulative overall cost in USD for the selected GPU preset. Prefix-cache lines pay round-0 recompute, then 10s of KV-storage cost for the full prefix plus recompute cost for new tokens. Compaction lines pay round-0 recompute, then recompute cost for the compacted prefix plus new tokens.';
+      }
+      if (isAvgQualityMode()) {
+        return 'X axis shows total overall cost in USD. Y axis shows average F1-score across all turns. Prefix caching contributes one point, and each compaction ratio contributes one point using the same overall-cost and quality calculations as Cost-Vs-Quality.';
+      }
+      return 'X axis shows cumulative overall cost in USD. Y axis shows F1-score. Prefix caching starts at 100 and quality drop become sub-linear to  linear to exponential with growing length. Each compaction curve starts at 100 and drops inversely to compaction rate. Noise is modelled by a random variable, with more noise at higher compaction rate. ';
     }
 
     function buildDatasets() {
       const datasets = [];
       if (state.prefixData) {
+        const prefixSeries = (isCostQualityMode() || isAvgQualityMode())
+          ? state.prefixData.points.map(p => ({ x: p.overall_cost, y: p[isAvgQualityMode() ? 'avg_f1_score' : 'f1_score'] }))
+          : state.prefixData.points.map(p => ({ x: p.turn, y: p[yValueKey()] }));
         datasets.push({
           label: lineLabelBase(),
-          data: state.prefixData.points.map(p => ({ x: p.turn, y: p[yValueKey()] })),
+          data: prefixSeries,
           borderColor: '#79a6ff',
           backgroundColor: '#79a6ff',
           borderWidth: 3,
@@ -299,9 +321,12 @@
         const data = state.compactionData.get(key);
         if (!data) return;
         const color = colorForIndex(idx);
+        const compSeries = (isCostQualityMode() || isAvgQualityMode())
+          ? data.points.map(p => ({ x: p.overall_cost, y: p[isAvgQualityMode() ? 'avg_f1_score' : 'f1_score'] }))
+          : data.points.map(p => ({ x: p.turn, y: p[yValueKey()] }));
         datasets.push({
           label: `Compaction ${ratioLabel(key)}`,
-          data: data.points.map(p => ({ x: p.turn, y: p[yValueKey()] })),
+          data: compSeries,
           borderColor: color,
           backgroundColor: color,
           borderDash: [8, 4],
@@ -314,8 +339,19 @@
       return datasets;
     }
 
+
+    function costQualityXMax(datasets) {
+      if (!(isCostQualityMode() || isAvgQualityMode()) || datasets.length === 0) return undefined;
+      const xs = datasets.flatMap(ds => ds.data.map(p => Number(p.x)).filter(Number.isFinite));
+      if (xs.length === 0) return undefined;
+      const maxX = Math.max(...xs);
+      if (maxX <= 0) return 1;
+      return maxX * 1.02;
+    }
+
     function renderChart() {
       const datasets = buildDatasets();
+      const xMax = costQualityXMax(datasets);
       if (!state.chart) {
         state.chart = new Chart(els.chartCanvas.getContext('2d'), {
           type: 'line',
@@ -331,6 +367,8 @@
               tooltip: {
                 callbacks: {
                   label(ctx) {
+                    if (isCostQualityMode()) { return `${ctx.dataset.label}: cost=$${Number(ctx.parsed.x).toFixed(4)}, F1=${Number(ctx.parsed.y).toFixed(2)}`; }
+                    if (isAvgQualityMode()) { return `${ctx.dataset.label}: total cost=$${Number(ctx.parsed.x).toFixed(4)}, avg F1=${Number(ctx.parsed.y).toFixed(2)}`; }
                     return `${ctx.dataset.label}: ${tooltipFormatter(ctx.parsed.y)}`;
                   }
                 }
@@ -339,15 +377,21 @@
             scales: {
               x: {
                 type: 'linear',
-                title: { display: true, text: 'Turn', color: '#b8c0e0' },
-                ticks: { color: '#eef2ff', precision: 0 },
+                min: (isCostQualityMode() || isAvgQualityMode()) ? 0 : undefined,
+                max: xMax,
+                title: { display: true, text: xAxisTitle(), color: '#b8c0e0' },
+                ticks: { color: '#eef2ff', precision: (isCostQualityMode() || isAvgQualityMode()) ? undefined : 0, callback(value) { return (isCostQualityMode() || isAvgQualityMode()) ? `$${Number(value).toFixed(3)}` : value; } },
                 grid: { color: 'rgba(255,255,255,0.08)' }
               },
               y: {
                 title: { display: true, text: yAxisTitle(), color: '#b8c0e0' },
                 ticks: {
                   color: '#eef2ff',
-                  callback(value) { return isKvMode() ? formatBytes(value) : `$${Number(value).toFixed(3)}`; }
+                  callback(value) {
+                    if (isKvMode()) return formatBytes(value);
+                    if (isCostQualityMode() || isAvgQualityMode()) return `${Number(value).toFixed(1)}`;
+                    return `$${Number(value).toFixed(3)}`;
+                  }
                 },
                 grid: { color: 'rgba(255,255,255,0.08)' }
               }
@@ -356,6 +400,9 @@
         });
       } else {
         state.chart.data.datasets = datasets;
+        state.chart.options.scales.x.title.text = xAxisTitle();
+        state.chart.options.scales.x.min = (isCostQualityMode() || isAvgQualityMode()) ? 0 : undefined;
+        state.chart.options.scales.x.max = xMax;
         state.chart.options.scales.y.title.text = yAxisTitle();
         state.chart.update();
       }
@@ -364,7 +411,7 @@
 
     function updateStats() {
       els.traceName.textContent = els.traceSelect.value || '—';
-      els.primaryStatLabel.textContent = isKvMode() ? 'Prefix KV peak' : (isOverallMode() ? 'Prefix-cache total overall cost' : 'Prefix-cache total');
+      els.primaryStatLabel.textContent = isKvMode() ? 'Prefix KV peak' : ((isOverallMode() || isCostQualityMode() || isAvgQualityMode()) ? 'Prefix-cache total overall cost' : 'Prefix-cache total');
       els.primaryStatValue.textContent = state.prefixData ? formatPrimaryValue(primaryTotal(state.prefixData)) : '—';
       els.turnCount.textContent = state.prefixData ? String(state.prefixData.points.length) : '—';
       els.modelName.textContent = state.modelName || '—';
@@ -374,7 +421,7 @@
       } else {
         els.bytesPerToken.textContent = '—';
       }
-      els.subtitle.innerHTML = `Switch between cost growth, KV cache growth, and overall cost for model - <strong>${state.modelName}</strong>.`;
+      els.subtitle.innerHTML = `Switch between cost growth, KV cache growth, overall cost, Cost-Vs-Quality, and Avg Quality vs total cost for model - <strong>${state.modelName}</strong>.`;
     }
 
     function renderRatioPills() {
