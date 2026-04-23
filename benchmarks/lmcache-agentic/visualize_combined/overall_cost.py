@@ -4,7 +4,14 @@ from prefix_cache_cost import load_session_rows
 from model_catalog import get_model_info
 from gpu_catalog import get_gpu_info
 
-GAP_SECONDS = 10.0
+DEFAULT_GAP_SECONDS = 10.0
+
+
+def validate_gap_seconds(gap_seconds: float) -> float:
+    gap = float(gap_seconds)
+    if gap <= 0:
+        raise ValueError('gap_seconds must be greater than 0')
+    return gap
 
 
 def compute_cost_from_tokens(tokens: float, throughput_tokens_per_second: float, cost_per_second_usd: float) -> float:
@@ -33,7 +40,8 @@ def usable_kv_memory_bytes(model_name: str, gpu_name: str) -> float:
     return float(kv_bytes)
 
 
-def storage_cost_for_prefix_tokens(prefix_tokens: float, model_name: str, gpu_name: str, gap_seconds: float = GAP_SECONDS) -> dict:
+def storage_cost_for_prefix_tokens(prefix_tokens: float, model_name: str, gpu_name: str, gap_seconds: float = DEFAULT_GAP_SECONDS) -> dict:
+    gap_seconds = validate_gap_seconds(gap_seconds)
     model = get_model_info(model_name)
     gpu = get_gpu_info(gpu_name)
     prefix_kv_bytes = prefix_tokens * model['bytes_per_token']
@@ -48,7 +56,8 @@ def storage_cost_for_prefix_tokens(prefix_tokens: float, model_name: str, gpu_na
     }
 
 
-def compute_overall_prefix_curve(csv_path: str, target_session_id: str, model_name: str, gpu_name: str) -> dict:
+def compute_overall_prefix_curve(csv_path: str, target_session_id: str, model_name: str, gpu_name: str, gap_seconds: float = DEFAULT_GAP_SECONDS) -> dict:
+    gap_seconds = validate_gap_seconds(gap_seconds)
     rows = load_session_rows(csv_path, target_session_id)
     if not rows:
         raise ValueError(f'No rows found for session_id={target_session_id!r}')
@@ -73,7 +82,7 @@ def compute_overall_prefix_curve(csv_path: str, target_session_id: str, model_na
 
     for idx, row in enumerate(rows, start=1):
         extra_len = row['next_turn_added_length']
-        storage = storage_cost_for_prefix_tokens(row['prefix_length'], model_name, gpu_name)
+        storage = storage_cost_for_prefix_tokens(row['prefix_length'], model_name, gpu_name, gap_seconds=gap_seconds)
         recompute_new_cost = compute_cost_from_tokens(
             extra_len,
             gpu['throughput_tokens_per_second'],
@@ -103,13 +112,14 @@ def compute_overall_prefix_curve(csv_path: str, target_session_id: str, model_na
         'metric': 'overall_cost',
         'model_name': model_name,
         'gpu_name': gpu_name,
-        'gap_seconds': GAP_SECONDS,
+        'gap_seconds': gap_seconds,
         'points': points,
         'total_overall_cost': cumulative_cost,
     }
 
 
-def compute_overall_compaction_curve(csv_path: str, target_session_id: str, compaction_fraction: float, model_name: str, gpu_name: str) -> dict:
+def compute_overall_compaction_curve(csv_path: str, target_session_id: str, compaction_fraction: float, model_name: str, gpu_name: str, gap_seconds: float = DEFAULT_GAP_SECONDS) -> dict:
+    gap_seconds = validate_gap_seconds(gap_seconds)
     if not (0.0 <= compaction_fraction <= 1.0):
         raise ValueError('compaction_fraction must be between 0.0 and 1.0')
 
@@ -170,7 +180,7 @@ def compute_overall_compaction_curve(csv_path: str, target_session_id: str, comp
         'metric': 'overall_cost',
         'model_name': model_name,
         'gpu_name': gpu_name,
-        'gap_seconds': GAP_SECONDS,
+        'gap_seconds': gap_seconds,
         'compaction_fraction': compaction_fraction,
         'points': points,
         'total_overall_cost': cumulative_cost,

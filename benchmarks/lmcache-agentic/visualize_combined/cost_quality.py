@@ -138,8 +138,9 @@ def compute_cost_quality_prefix_curve(
     target_session_id: str,
     model_name: str,
     gpu_name: str,
+    gap_seconds: float = 10.0,
 ) -> dict:
-    base = compute_overall_prefix_curve(csv_path, target_session_id, model_name, gpu_name)
+    base = compute_overall_prefix_curve(csv_path, target_session_id, model_name, gpu_name, gap_seconds=gap_seconds)
     qualities = _prefix_quality_points(len(base["points"]))
 
     points = []
@@ -162,6 +163,7 @@ def compute_cost_quality_compaction_curve(
     compaction_fraction: float,
     model_name: str,
     gpu_name: str,
+    gap_seconds: float = 10.0,
 ) -> dict:
     base = compute_overall_compaction_curve(
         csv_path,
@@ -169,6 +171,7 @@ def compute_cost_quality_compaction_curve(
         compaction_fraction,
         model_name,
         gpu_name,
+        gap_seconds=gap_seconds,
     )
     seed_key = f"{target_session_id}|{model_name}|{gpu_name}|{len(base['points'])}"
     qualities = _compaction_quality_points(
@@ -202,8 +205,9 @@ def compute_avg_quality_prefix_point(
     target_session_id: str,
     model_name: str,
     gpu_name: str,
+    gap_seconds: float = 10.0,
 ) -> dict:
-    base = compute_cost_quality_prefix_curve(csv_path, target_session_id, model_name, gpu_name)
+    base = compute_cost_quality_prefix_curve(csv_path, target_session_id, model_name, gpu_name, gap_seconds=gap_seconds)
     total_cost = float(base.get("total_overall_cost", 0.0))
     avg_f1 = _average_quality(base.get("points", []))
     result = dict(base)
@@ -224,6 +228,7 @@ def compute_avg_quality_compaction_point(
     compaction_fraction: float,
     model_name: str,
     gpu_name: str,
+    gap_seconds: float = 10.0,
 ) -> dict:
     base = compute_cost_quality_compaction_curve(
         csv_path,
@@ -231,6 +236,7 @@ def compute_avg_quality_compaction_point(
         compaction_fraction,
         model_name,
         gpu_name,
+        gap_seconds=gap_seconds,
     )
     total_cost = float(base.get("total_overall_cost", 0.0))
     avg_f1 = _average_quality(base.get("points", []))

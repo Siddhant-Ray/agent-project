@@ -8,7 +8,7 @@ from kv_compaction_growth import compute_kv_compaction_curve
 from kv_prefix_growth import compute_kv_prefix_curve
 from model_catalog import DEFAULT_MODEL, get_model_info, model_options
 from gpu_catalog import DEFAULT_GPU, get_gpu_info, gpu_options
-from overall_cost import compute_overall_compaction_curve, compute_overall_prefix_curve
+from overall_cost import DEFAULT_GAP_SECONDS, compute_overall_compaction_curve, compute_overall_prefix_curve
 from cost_quality import (
     compute_cost_quality_compaction_curve,
     compute_cost_quality_prefix_curve,
@@ -23,10 +23,23 @@ def create_app(csv_path: str) -> Flask:
     app.config['CSV_PATH'] = str(Path(csv_path).resolve())
     app.config['DEFAULT_MODEL'] = DEFAULT_MODEL
     app.config['DEFAULT_GPU'] = DEFAULT_GPU
+    app.config['DEFAULT_GAP_SECONDS'] = DEFAULT_GAP_SECONDS
 
     @app.get('/')
     def index():
-        return render_template('index.html', default_model=app.config['DEFAULT_MODEL'])
+        return render_template('index.html', default_model=app.config['DEFAULT_MODEL'], default_gap_seconds=app.config['DEFAULT_GAP_SECONDS'])
+
+
+
+    def parse_gap_seconds() -> float:
+        raw = request.args.get('gap_seconds', str(app.config['DEFAULT_GAP_SECONDS'])).strip()
+        try:
+            gap_seconds = float(raw)
+        except ValueError as exc:
+            raise ValueError('gap_seconds must be a number greater than 0') from exc
+        if gap_seconds <= 0:
+            raise ValueError('gap_seconds must be greater than 0')
+        return gap_seconds
 
     @app.get('/api/session_ids')
     def session_ids():
@@ -119,7 +132,8 @@ def create_app(csv_path: str) -> Flask:
         if not session_id:
             return jsonify({'error': 'Missing session_id'}), 400
         try:
-            result = compute_overall_prefix_curve(app.config['CSV_PATH'], session_id, model_name, gpu_name)
+            gap_seconds = parse_gap_seconds()
+            result = compute_overall_prefix_curve(app.config['CSV_PATH'], session_id, model_name, gpu_name, gap_seconds=gap_seconds)
             return jsonify(result)
         except Exception as exc:
             return jsonify({'error': str(exc)}), 400
@@ -138,7 +152,8 @@ def create_app(csv_path: str) -> Flask:
             ratio = float(ratio_text)
             if ratio > 1.0:
                 ratio /= 100.0
-            result = compute_overall_compaction_curve(app.config['CSV_PATH'], session_id, ratio, model_name, gpu_name)
+            gap_seconds = parse_gap_seconds()
+            result = compute_overall_compaction_curve(app.config['CSV_PATH'], session_id, ratio, model_name, gpu_name, gap_seconds=gap_seconds)
             return jsonify(result)
         except Exception as exc:
             return jsonify({'error': str(exc)}), 400
@@ -152,7 +167,8 @@ def create_app(csv_path: str) -> Flask:
         if not session_id:
             return jsonify({'error': 'Missing session_id'}), 400
         try:
-            result = compute_cost_quality_prefix_curve(app.config['CSV_PATH'], session_id, model_name, gpu_name)
+            gap_seconds = parse_gap_seconds()
+            result = compute_cost_quality_prefix_curve(app.config['CSV_PATH'], session_id, model_name, gpu_name, gap_seconds=gap_seconds)
             return jsonify(result)
         except Exception as exc:
             return jsonify({'error': str(exc)}), 400
@@ -171,7 +187,8 @@ def create_app(csv_path: str) -> Flask:
             ratio = float(ratio_text)
             if ratio > 1.0:
                 ratio /= 100.0
-            result = compute_cost_quality_compaction_curve(app.config['CSV_PATH'], session_id, ratio, model_name, gpu_name)
+            gap_seconds = parse_gap_seconds()
+            result = compute_cost_quality_compaction_curve(app.config['CSV_PATH'], session_id, ratio, model_name, gpu_name, gap_seconds=gap_seconds)
             return jsonify(result)
         except Exception as exc:
             return jsonify({'error': str(exc)}), 400
@@ -185,7 +202,8 @@ def create_app(csv_path: str) -> Flask:
         if not session_id:
             return jsonify({'error': 'Missing session_id'}), 400
         try:
-            result = compute_avg_quality_prefix_point(app.config['CSV_PATH'], session_id, model_name, gpu_name)
+            gap_seconds = parse_gap_seconds()
+            result = compute_avg_quality_prefix_point(app.config['CSV_PATH'], session_id, model_name, gpu_name, gap_seconds=gap_seconds)
             return jsonify(result)
         except Exception as exc:
             return jsonify({'error': str(exc)}), 400
@@ -204,7 +222,8 @@ def create_app(csv_path: str) -> Flask:
             ratio = float(ratio_text)
             if ratio > 1.0:
                 ratio /= 100.0
-            result = compute_avg_quality_compaction_point(app.config['CSV_PATH'], session_id, ratio, model_name, gpu_name)
+            gap_seconds = parse_gap_seconds()
+            result = compute_avg_quality_compaction_point(app.config['CSV_PATH'], session_id, ratio, model_name, gpu_name, gap_seconds=gap_seconds)
             return jsonify(result)
         except Exception as exc:
             return jsonify({'error': str(exc)}), 400

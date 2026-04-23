@@ -82,7 +82,7 @@
     <div class="topbar">
       <div>
         <h1>Trace Visualizer</h1>
-        <p class="subtitle" id="subtitle">Switch between cost growth, KV cache growth, overall cost, Cost-Vs-Quality, and Avg-Quality-Vs-Total-Cost for model - <strong>{{ default_model }}</strong>.</p>
+        <p class="subtitle" id="subtitle">Switch between cost growth, KV cache growth, overall cost, Cost-Vs-Quality, and Avg Quality vs total cost for model - <strong>{{ default_model }}</strong>.</p>
       </div>
     </div>
 
@@ -95,7 +95,7 @@
             <option value="kv">KV Cache size</option>
             <option value="overall">Overall cost</option>
             <option value="cost_quality">Cost-Vs-Quality</option>
-            <option value="avg_quality_total_cost">Avg-Quality-Vs-Total-Cost</option>
+            <option value="avg_quality_total_cost">Avg Quality vs total cost</option>
           </select>
         </div>
 
@@ -107,6 +107,12 @@
         <div>
           <label for="gpuSelect">GPU (Used for overall cost)</label>
           <select id="gpuSelect"></select>
+        </div>
+
+        <div>
+          <label for="gapInput">Gap seconds (Used for overall cost)</label>
+          <input id="gapInput" type="text" value="{{ default_gap_seconds }}" />
+          <div class="hint">Must be greater than 0. Floats are allowed. Metrics that do not use gap simply ignore this value.</div>
         </div>
 
         <div>
@@ -189,6 +195,7 @@
       metricSelect: document.getElementById('metricSelect'),
       modelSelect: document.getElementById('modelSelect'),
       gpuSelect: document.getElementById('gpuSelect'),
+      gapInput: document.getElementById('gapInput'),
       traceSelect: document.getElementById('traceSelect'),
       ratioInput: document.getElementById('ratioInput'),
       addRatioBtn: document.getElementById('addRatioBtn'),
@@ -208,6 +215,19 @@
     };
 
     function showError(message = '') { els.errorBox.textContent = message; }
+
+    function parsedGapSeconds() {
+      const raw = els.gapInput.value.trim();
+      const value = Number(raw);
+      if (!Number.isFinite(value) || value <= 0) {
+        throw new Error('Gap seconds must be a number greater than 0.');
+      }
+      return value;
+    }
+
+    function gapQuery() {
+      return `gap_seconds=${encodeURIComponent(parsedGapSeconds())}`;
+    }
 
     async function fetchJson(url) {
       const res = await fetch(url);
@@ -242,16 +262,16 @@
     function prefixEndpoint() {
       if (isCostMode()) return '/api/prefix_cache';
       if (isKvMode()) return `/api/kv_prefix?model=${encodeURIComponent(state.modelName)}`;
-      if (isCostQualityMode()) return `/api/cost_quality_prefix?model=${encodeURIComponent(state.modelName)}&gpu=${encodeURIComponent(state.gpuName)}`;
-      if (isAvgQualityMode()) return `/api/avg_quality_prefix?model=${encodeURIComponent(state.modelName)}&gpu=${encodeURIComponent(state.gpuName)}`;
-      return `/api/overall_prefix?model=${encodeURIComponent(state.modelName)}&gpu=${encodeURIComponent(state.gpuName)}`;
+      if (isCostQualityMode()) return `/api/cost_quality_prefix?model=${encodeURIComponent(state.modelName)}&gpu=${encodeURIComponent(state.gpuName)}&${gapQuery()}`;
+      if (isAvgQualityMode()) return `/api/avg_quality_prefix?model=${encodeURIComponent(state.modelName)}&gpu=${encodeURIComponent(state.gpuName)}&${gapQuery()}`;
+      return `/api/overall_prefix?model=${encodeURIComponent(state.modelName)}&gpu=${encodeURIComponent(state.gpuName)}&${gapQuery()}`;
     }
     function compactionEndpoint(ratio) {
       if (isCostMode()) return `/api/compaction?ratio=${encodeURIComponent(ratio)}`;
       if (isKvMode()) return `/api/kv_compaction?ratio=${encodeURIComponent(ratio)}&model=${encodeURIComponent(state.modelName)}`;
-      if (isCostQualityMode()) return `/api/cost_quality_compaction?ratio=${encodeURIComponent(ratio)}&model=${encodeURIComponent(state.modelName)}&gpu=${encodeURIComponent(state.gpuName)}`;
-      if (isAvgQualityMode()) return `/api/avg_quality_compaction?ratio=${encodeURIComponent(ratio)}&model=${encodeURIComponent(state.modelName)}&gpu=${encodeURIComponent(state.gpuName)}`;
-      return `/api/overall_compaction?ratio=${encodeURIComponent(ratio)}&model=${encodeURIComponent(state.modelName)}&gpu=${encodeURIComponent(state.gpuName)}`;
+      if (isCostQualityMode()) return `/api/cost_quality_compaction?ratio=${encodeURIComponent(ratio)}&model=${encodeURIComponent(state.modelName)}&gpu=${encodeURIComponent(state.gpuName)}&${gapQuery()}`;
+      if (isAvgQualityMode()) return `/api/avg_quality_compaction?ratio=${encodeURIComponent(ratio)}&model=${encodeURIComponent(state.modelName)}&gpu=${encodeURIComponent(state.gpuName)}&${gapQuery()}`;
+      return `/api/overall_compaction?ratio=${encodeURIComponent(ratio)}&model=${encodeURIComponent(state.modelName)}&gpu=${encodeURIComponent(state.gpuName)}&${gapQuery()}`;
     }
     function yValueKey() { if (isKvMode()) return 'kv_bytes'; if (isAvgQualityMode()) return 'avg_f1_score'; return 'cumulative_cost'; }
     function lineLabelBase() { return isKvMode() ? 'Prefix KV' : 'Prefix cache'; }
@@ -292,7 +312,7 @@
         return 'Y axis shows KV cache size in bytes for the selected model and trace, auto-formatted as MiB or GiB. X axis shows turn number, where turn 0 is the initial uncached prefix.';
       }
       if (isOverallMode()) {
-        return 'Y axis shows cumulative overall cost in USD for the selected GPU preset. Prefix-cache lines pay round-0 recompute, then 10s of KV-storage cost for the full prefix plus recompute cost for new tokens. Compaction lines pay round-0 recompute, then recompute cost for the compacted prefix plus new tokens.';
+        return `Y axis shows cumulative overall cost in USD for the selected GPU preset. Prefix-cache lines pay round-0 recompute, then ${parsedGapSeconds()}s of KV-storage cost for the full prefix plus recompute cost for new tokens. Compaction lines pay round-0 recompute, then recompute cost for the compacted prefix plus new tokens.`;
       }
       if (isAvgQualityMode()) {
         return 'X axis shows total overall cost in USD. Y axis shows average F1-score across all turns. Prefix caching contributes one point, and each compaction ratio contributes one point using the same overall-cost and quality calculations as Cost-Vs-Quality.';
@@ -332,8 +352,9 @@
           borderDash: [8, 4],
           borderWidth: 2,
           tension: 0.16,
-          pointRadius: 1.5,
-          pointHoverRadius: 4,
+          pointStyle: 'crossRot',
+          pointRadius: 5,
+          pointHoverRadius: 6,
         });
       });
       return datasets;
