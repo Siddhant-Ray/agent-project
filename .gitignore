@@ -2,9 +2,10 @@ venv*
 replay/checkpoints*
 replay/downloads
 __pycache__/
-*.pdf 
+*.pdf
 data/
 logs/
 *.txt
 *.csv
 *jsonl
+.DS_Store
